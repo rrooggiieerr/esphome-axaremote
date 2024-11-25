@@ -19,13 +19,14 @@ Features:
 - Calibrate the open/close timings
 - Use remote control simultaneously
 
-### Using the remote
+### Using the remote control
 
-The AXA Remote only reports if the device is locked or unlocked. When using the remote to open the
-window from a closed position the integration can detect this and report the state accordingly. The
-same applies for closing the window with the remote till a fully closed position. However stopping
-the window or partially opening/closing the window can not be detected and the exact position the
-window is opened at will not correspond with the real position.
+The AXA Remote only reports if the device is locked or unlocked. When using the remote control to
+open the window from a closed position the integration can detect this and report the state
+accordingly. The same applies for closing the window with the remote control till a fully closed
+position. However stopping the window or partially opening/closing the window with the remote
+control can not be detected and the exact position the window is opened at will not correspond with
+the real position.
 
 ## Hardware required:
 
