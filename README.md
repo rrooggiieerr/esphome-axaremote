@@ -63,20 +63,28 @@ and less noisy while a higher voltage faster and noisier.
 
 This are the protocol details:  
 
-19200 baud 8N2  
-Device command: `\r\nDEVICE\r\n`  
-Version command: `\r\nVERSION\r\n`  
-Status command: `\r\nSTATUS\r\n`  
-Open command: `\r\nOPEN\r\n`  
-Stop command: `\r\nSTOP\r\n`  
-Close command: `\r\nCLOSE\r\n`
+Serial port settings: 19200 baud 8N2  
+
+Device command: `DEVICE`, returns the device type.  
+Version command: `VERSION`, returns the firmware version of the AXA Remote.  
+Status command: `STATUS`, returns the current lock state.  
+Open command: `OPEN`, opens the window opener.  
+Stop command: `STOP`, stops the window opener.  
+Close command: `CLOSE`, closes the window opener.  
+Help command: `HELP`, shows the available commands.
+
+Each command is ended with a cariage return and newline `\r\n`.
 
 ### Lock states
 
 - Unlocked
 - Strong Locked
 - Weak Locked
-- Error
+
+### Quirks
+
+After a power outage the AXA Remote always reports the lock state as unlocked even though the
+window is closed and locked. Only opening and closing the window will reset the lock state.
 
 ## ESPHome example configuration:
 ```
