@@ -25,18 +25,18 @@ The AXA Remote only reports if the device is locked or unlocked. When using the 
 window from a closed position the integration can detect this and report the state accordingly. The
 same applies for closing the window with the remote till a fully closed position. However stopping
 the window or partially opening/closing the window can not be detected and the exact position the
-window is opend at will not correspond with the real position.
+window is opened at will not correspond with the real position.
 
 ## Hardware required:
 
-- ESP8266, ESP32 or other ESPHome supported microcontroller
+- ESP8266, ESP32 or other ESPHome supported micro controller
 - LIN-bus controller or any other kind of level converter
 - External power supply
 
 ### Wiring
 
 The AXA Remote has identical two RJ12 (6P6C) connectors, each pin on the connector are connected
-with eachother. The pinout is as follows:
+with each other. The pinout is as follows:
 
 |Pin|Function|
 |:-:|:------:|
@@ -53,7 +53,7 @@ Wiring a LIN-bus controller as level converter goes as follows:
 
 ### Powering the AXA Remote
 
-The outer pins of the RJ12 are the + voltage input and pin 2/5 the 0 voltage. The offical AXA
+The outer pins of the RJ12 are the + voltage input and pin 2/5 the 0 voltage. The official AXA
 Remote power supply delivers 7.5 Volt, however the device also seems to work fine on 9 Volt. The
 voltage does influence the speed and noise of the device, a lower voltage runs the device slower
 and less noisy while a higher voltage faster and noisier.
@@ -130,7 +130,7 @@ cover:
 
 This AXA Remote component for ESPHome can automatically calibrate the unlock, open, close and lock
 durations. To do this open the window fully and close the window from the ESPHome device. The
-component will measure the time it takes untill the lock is in one of the locked states. By default
+component will measure the time it takes until the lock is in one of the locked states. By default
 the close duration is logged as info message to the ESPHome logging console. You can then use this
 value to set the __close_duration__ of your ESPHome configuration YAML. You can also enable
 __auto_calibrate__ which will automatically update the unlock, open, close and lock durations every
@@ -142,7 +142,7 @@ time the window is closed from fully open to fully closed and locked.
 Do you enjoy using this ESPHome component? Then consider supporting my work using one of the
 following platforms, your donation is greatly appreciated and keeps me motivated:
 
-[![Github Sponsors][github-shield]][github]
+[![GitHub Sponsors][github-shield]][github]
 [![PayPal][paypal-shield]][paypal]
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 [![Patreon][patreon-shield]][patreon]
