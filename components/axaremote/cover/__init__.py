@@ -15,7 +15,7 @@ CONF_AUTO_CALIBRATE = "auto_calibrate"
 CONFIG_SCHEMA = cover.COVER_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(AXARemoteCover),
-        cv.Optional(CONF_CLOSE_DURATION, default="40s"): cv.positive_time_period_milliseconds,
+        cv.Optional(CONF_CLOSE_DURATION, default="50s"): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_AUTO_CALIBRATE, default=False): bool,
     }
 ).extend(uart.UART_DEVICE_SCHEMA)

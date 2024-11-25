@@ -115,7 +115,7 @@ uart:
 cover:
   - platform: axaremote
     name: "AXA Remote"
-    close_duration: 41s
+    close_duration: 50s
     auto_calibrate: True
 ```
 
