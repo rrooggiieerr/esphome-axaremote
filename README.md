@@ -36,8 +36,8 @@ the real position.
 
 ### Wiring
 
-The AXA Remote has two identical RJ12 (6P6C) connectors, each pin on the connector are connected
-with each other. The pinout is as follows:
+The AXA Remote has two identical RJ12 (6P6C) connectors, a pin on one connector is connected with
+the same pin on the other connector. The pinout is as follows:
 
 |Pin|Function|
 |:-:|:------:|
