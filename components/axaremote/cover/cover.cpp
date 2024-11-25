@@ -26,7 +26,7 @@ void AXARemoteCover::setup() {
 	if (restore.has_value()) {
 		ESP_LOGI(TAG, "Restoring state");
 		restore->apply(this);
-		ESP_LOGI(TAG, "Current position: %d", this->position);
+		ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
 		ESP_LOGI(TAG, "Current operation: %d", this->current_operation);
 		if (this->position == cover::COVER_CLOSED && this->current_operation == cover::COVER_OPERATION_IDLE && this->send_cmd_(AXACommand::STATUS) == AXAResponseCode::Unlocked) {
 			// After a power outage the AXA Remote always returns "Unlocked", even when the window is supposed to be closed.
@@ -304,8 +304,9 @@ bool AXARemoteCover::is_at_target_() const {
 
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
 	// Send the command.
-	if (cmd != AXACommand::STATUS)
+	if (cmd != AXACommand::STATUS) {
 		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
+	}
 	this->write_str(cmd.c_str());
 	this->write_str("\r\n");
 	esphome::delay(15);
@@ -318,8 +319,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 		if (c != '\r' && c != '\n')
 			response_ += c;
 		if (c == '\n') {
-			if (response_ != cmd)
-				ESP_LOGD(TAG, "Unexpected command echo received: %s", response_.c_str());
+			if (response_ != cmd) {
+				ESP_LOGE(TAG, "Unexpected command echo received: %s", response_.c_str());
+			}
 			break;
 		}
 	}
@@ -346,8 +348,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 			break;
 	}
 
-	if (cmd != AXACommand::STATUS)
+	if (cmd != AXACommand::STATUS) {
 		ESP_LOGD(TAG, "Response: %d %s", response_code, response.c_str());
+	}
 
 	// Read whatever is left.
 	std::string remaining_;
@@ -356,8 +359,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 		this->read_byte(&c);
 		remaining_ += c;
 	}
-	if (remaining_ != "")
+	if (remaining_ != "") {
 		ESP_LOGE(TAG, "Unexpected remaining response: %s", remaining_.c_str());
+	}
 
 	return AXAResponseCode(response_code);
 }
