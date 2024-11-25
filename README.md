@@ -80,7 +80,8 @@ Close command: `\r\nCLOSE\r\n`
 ## ESPHome example configuration:
 ```
 esphome:
-  name: AXA Remote
+  name: axaremote
+  friendly_name: AXA Remote
 
 external_components:
   - source: github://rrooggiieerr/esphome-axaremote
@@ -91,6 +92,25 @@ esp8266:
 # Enable logging
 logger:
   level: INFO
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: ...
+
+ota:
+  - platform: esphome
+    password: ...
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+uart:
+  tx_pin: ...
+  rx_pin: ...
+  baud_rate: 19200
+  stop_bits: 2
 
 cover:
   - platform: axaremote
