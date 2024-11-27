@@ -3,7 +3,7 @@
 [![GitHub Release][releases-shield]][releases]
 [![Licence][license-shield]][license]
 [![Maintainer][maintainer-shield]][maintainer]  
-[![Github Sponsors][github-shield]][github]
+[![GitHub Sponsors][github-shield]][github]
 [![PayPal][paypal-shield]][paypal]
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 [![Patreon][patreon-shield]][patreon]
@@ -73,7 +73,7 @@ Stop command: `STOP`, stops the window opener.
 Close command: `CLOSE`, closes the window opener.  
 Help command: `HELP`, shows the available commands.
 
-Each command is ended with a cariage return and newline `\r\n`.
+Each command is ended with a carriage return and newline `\r\n`.
 
 ### Lock states
 
