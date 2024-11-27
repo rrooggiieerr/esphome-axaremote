@@ -36,7 +36,7 @@ the real position.
 
 ### Wiring
 
-The AXA Remote has two identical RJ12 (6P6C) connectors, a pin on one connector is connected with
+The AXA Remote has two identical RJ25 (6P6C) connectors, a pin on one connector is connected with
 the same pin on the other connector. The pinout is as follows:
 
 |Pin|Function|
@@ -54,7 +54,7 @@ Wiring a LIN-bus controller as level converter goes as follows:
 
 ### Powering the AXA Remote
 
-The outer pins of the RJ12 are the + voltage input and pin 2/5 the 0 voltage. The official AXA
+The outer pins of the RJ25 are the + voltage input and pin 2/5 the 0 voltage. The official AXA
 Remote power supply delivers 7.5 Volt, however the device also seems to work fine on 9 Volt. The
 voltage does influence the speed and noise of the device, a lower voltage runs the device slower
 and less noisy while a higher voltage faster and noisier.
@@ -65,7 +65,7 @@ This are the protocol details:
 
 Serial port settings: 19200 baud 8N2  
 
-Device command: `DEVICE`, returns the device type.  
+Device command: `DEVICE`, returns the device type, `AXA RV2900 2.0` on my device.  
 Version command: `VERSION`, returns the firmware version of the AXA Remote.  
 Status command: `STATUS`, returns the current lock state.  
 Open command: `OPEN`, opens the window opener.  
