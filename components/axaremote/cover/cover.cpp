@@ -313,56 +313,45 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	while(this->available() == 0)
 		esphome::delay(1);
 
-	// Read the command echo.
+	// Read the response.
+	bool echo_received = false;
+	int response_code = 0;
+	int response_code_ = 0;
 	std::string response_;
 	while(this->available() > 0) {
 		uint8_t c;
 		this->read_byte(&c);
-		if (c != '\r' && c != '\n')
+		if (response_.length() == 0 && c >= '0' && c <= '9')
+			response_code_ = (response_code_ * 10) + (c - '0');
+		else if (c == ' ' && response_.length() == 0) {
+			// Do nothing.
+		} else if (c != '\r' && c != '\n')
 			response_ += c;
-		if (c == '\n') {
-			if (response_ != cmd) {
-				ESP_LOGE(TAG, "Unexpected command echo received: %s", response_.c_str());
+		if (c == '\n' || !this->available()) {
+			if (response_ == cmd) {
+				// Command echo.
+				if (cmd != AXACommand::STATUS)
+					ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
+				echo_received = true;
+			} else if (response_.length() > 0) {
+				if (!echo_received && cmd != AXACommand::STATUS)
+					ESP_LOGW(TAG, "No command echo received");
+
+				if (response_code_ > 0) {
+					// The actual response.
+					if (cmd != AXACommand::STATUS)
+						ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
+					response += response_;
+					response_code = response_code_;
+					response_code_ = 0;
+				} else {
+					// Garbage.
+					ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
+				}
 			}
-			break;
+			response_.erase();
+			esphome::delay(10);
 		}
-	}
-	esphome::delay(10);
-
-	// Read the response code
-	int response_code = 0;
-	while(this->available() > 0) {
-		uint8_t c;
-		this->read_byte(&c);
-		if (c >= '0' && c <= '9') {
-			response_code = (response_code * 10) + (c - '0');
-		} else if (c == ' ')
-			break;
-	}
-
-	// Read the textual response.
-	while(this->available() > 0) {
-		uint8_t c;
-		this->read_byte(&c);
-		if (c != '\r' && c != '\n')
-			response += c;
-		if (c == '\n')
-			break;
-	}
-
-	if (cmd != AXACommand::STATUS) {
-		ESP_LOGD(TAG, "Response: %d %s", response_code, response.c_str());
-	}
-
-	// Read whatever is left.
-	std::string remaining_;
-	while(this->available() > 0) {
-		uint8_t c;
-		this->read_byte(&c);
-		remaining_ += c;
-	}
-	if (remaining_ != "") {
-		ESP_LOGE(TAG, "Unexpected remaining response: %s", remaining_.c_str());
 	}
 
 	return AXAResponseCode(response_code);
