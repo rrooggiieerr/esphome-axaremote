@@ -309,7 +309,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	}
 	this->write_str(cmd.c_str());
 	this->write_str("\r\n");
-	esphome::delay(15);
+
+	while(this->available() == 0)
+		esphome::delay(1);
 
 	// Read the command echo.
 	std::string response_;
