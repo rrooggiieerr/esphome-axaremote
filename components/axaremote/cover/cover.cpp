@@ -314,6 +314,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	bool echo_received = false;
 	int response_code_ = 0;
 	std::string response_;
+	const uint32_t now = millis();
 	while(true) {
 		uint8_t c;
 		this->read_byte(&c);
@@ -345,6 +346,11 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 				}
 			}
 			response_.erase();
+		}
+
+		if (millis() - now > 1000) {
+			ESP_LOGE(TAG, "Timeout while waiting for response");
+			return AXAResponseCode::Invalid;
 		}
 	}
 
