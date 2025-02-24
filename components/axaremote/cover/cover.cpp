@@ -310,15 +310,11 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	this->write_str(cmd.c_str());
 	this->write_str("\r\n");
 
-	while(this->available() == 0)
-		esphome::delay(1);
-
 	// Read the response.
 	bool echo_received = false;
-	int response_code = 0;
 	int response_code_ = 0;
 	std::string response_;
-	while(this->available() > 0) {
+	while(true) {
 		uint8_t c;
 		this->read_byte(&c);
 		if (response_.length() == 0 && c >= '0' && c <= '9')
@@ -342,19 +338,17 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 					if (cmd != AXACommand::STATUS)
 						ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
 					response += response_;
-					response_code = response_code_;
-					response_code_ = 0;
+					return AXAResponseCode(response_code_);
 				} else {
 					// Garbage.
 					ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
 				}
 			}
 			response_.erase();
-			esphome::delay(10);
 		}
 	}
 
-	return AXAResponseCode(response_code);
+	return AXAResponseCode::Invalid;
 }
 
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd) {
