@@ -146,6 +146,11 @@ __auto_calibrate__ which will automatically update the unlock, open, close and l
 time the window is closed from fully open to fully closed and locked.
 
 
+## Star this external component
+
+Help other ESPHome and AXA Remote users find this external component by starring this GitHub page.
+Click **⭐ Star** on the top right of the GitHub page.
+
 ## Support my work
 
 Do you enjoy using this ESPHome component? Then consider supporting my work using one of the
