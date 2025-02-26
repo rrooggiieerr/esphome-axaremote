@@ -30,9 +30,13 @@ the real position.
 
 ## Hardware required:
 
-- ESP8266, ESP32 or other ESPHome supported micro controller
+- ESP32 or other ESPHome supported micro controller
 - LIN-bus controller or any other kind of level converter
 - External power supply
+
+The AXA Remote component depends on the ESPHome UART component. The ESP8266 has a software emulated
+UART which has shown to be quite flaky. It is recomended to use a micro controller with a hardware
+UART, like the ESP32, for increased accuracy. 
 
 ### Wiring
 
@@ -96,8 +100,10 @@ external_components:
   - source: github://rrooggiieerr/esphome-axaremote
     refresh: 0s
 
-esp8266:
-  board: nodemcu
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
 
 # Enable logging
 logger:
@@ -117,8 +123,8 @@ wifi:
   password: !secret wifi_password
 
 uart:
-  tx_pin: ...
-  rx_pin: ...
+  tx_pin: ... # To pin 4 of the MCP2003
+  rx_pin: ... # To pin 1 of the MCP2003
   baud_rate: 19200
   stop_bits: 2
 
