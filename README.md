@@ -94,6 +94,7 @@ esphome:
 
 external_components:
   - source: github://rrooggiieerr/esphome-axaremote
+    refresh: 0s
 
 esp8266:
   board: nodemcu
