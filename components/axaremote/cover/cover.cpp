@@ -303,7 +303,7 @@ bool AXARemoteCover::is_at_target_() const {
 }
 
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
-	// Flush UART befor sending command.
+	// Flush UART before sending command.
 	this->flush();
 
 	// Send the command.
