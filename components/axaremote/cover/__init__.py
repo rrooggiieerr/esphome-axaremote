@@ -12,7 +12,7 @@ AXARemoteCover = axaremote_ns.class_('AXARemoteCover', cg.Component, cover.Cover
 
 CONF_AUTO_CALIBRATE = "auto_calibrate"
 
-CONFIG_SCHEMA = cover.COVER_SCHEMA.extend(
+CONFIG_SCHEMA = cover.cover_schema(AXARemoteCover).extend(
     {
         cv.GenerateID(): cv.declare_id(AXARemoteCover),
         cv.Optional(CONF_CLOSE_DURATION, default="50s"): cv.positive_time_period_milliseconds,
