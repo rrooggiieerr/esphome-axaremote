@@ -338,7 +338,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 					if (!echo_received && cmd != AXACommand::STATUS)
 						ESP_LOGW(TAG, "No command echo received");
 
-					if (response_code_ > 0) {
+					if (response_code_ >= int(AXAResponseCode::OK) && response_code_ <= int(AXAResponseCode::Error)) {
 						// The actual response.
 						if (cmd != AXACommand::STATUS)
 							ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
