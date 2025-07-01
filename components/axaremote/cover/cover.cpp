@@ -68,8 +68,9 @@ void AXARemoteCover::dump_config() {
 	ESP_LOGCONFIG(TAG, "  Close Duration: %.1fs", this->close_duration_ / 1e3f);
 	ESP_LOGCONFIG(TAG, "  Lock Duration: %.1fs", this->lock_duration_ / 1e3f);
 	ESP_LOGCONFIG(TAG, "  Auto calibrate: %s", this->auto_calibrate_ ? "True" : "False");
-	ESP_LOGCONFIG(TAG, "  Current operation: %d", this->current_operation);
-	ESP_LOGCONFIG(TAG, "  Current position: %.1f%%", this->position * 100);
+	ESP_LOGCONFIG(TAG, "  Operation: %d", this->current_operation);
+	ESP_LOGCONFIG(TAG, "  Window position: %.1f%%", this->position * 100);
+	ESP_LOGCONFIG(TAG, "  Lock position: %.1f%%", this->lock_position_ * 100);
 }
 
 cover::CoverTraits AXARemoteCover::get_traits() {
