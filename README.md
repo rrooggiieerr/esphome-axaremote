@@ -87,8 +87,12 @@ Each command is ended with a carriage return and newline `\r\n`.
 
 ### Quirks
 
-After a power outage the AXA Remote always reports the lock state as unlocked even though the
-window is closed and locked. Only opening and closing the window will reset the lock state.
+The AXA Remote firmware has some nasty quirks. 
+
+After a power outage the AXA Remote always reports the lock state as unlocked even when the window
+is closed and locked. Only opening and then closing the window will reset the lock state.
+
+After a power outage the AXA Remote will only close if first the open command is given.
 
 ## ESPHome example configuration:
 ```
