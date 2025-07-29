@@ -313,7 +313,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	// Send the command.
 	if (cmd != AXACommand::STATUS) {
 		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
-	}
+    } else {
+        ESP_LOGV(TAG, "Command: %s", cmd.c_str());
+    }
 	this->write_str(cmd.c_str());
 	this->write_str("\r\n");
 
@@ -337,6 +339,8 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 					// Command echo.
 					if (cmd != AXACommand::STATUS)
 						ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
+                    else
+                        ESP_LOGV(TAG, "Command echo received: %s", response_.c_str());
 					echo_received = true;
 				} else if (response_.length() > 0) {
 					if (!echo_received && cmd != AXACommand::STATUS)
@@ -346,11 +350,14 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 						// The actual response.
 						if (cmd != AXACommand::STATUS)
 							ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
+                        else
+                            ESP_LOGV(TAG, "Response: %d %s", response_code_, response_.c_str());
 						response += response_;
 						return AXAResponseCode(response_code_);
 					} else {
 						// Garbage.
-						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
+                        ESP_LOGW(TAG, "Garbage received:");
+                        ESP_LOG_BUFFER_HEXDUMP(TAG, response_.c_str(), response_.size(), ESP_LOG_WARN);
 					}
 				}
 				response_.erase();
