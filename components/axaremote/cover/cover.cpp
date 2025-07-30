@@ -96,6 +96,12 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 void AXARemoteCover::loop() {
 	const uint32_t now = millis();
 
+    //Update every 5 seconds
+    if (now - this->last_update_time_ < 5000) {
+        return;
+    }
+    this->last_update_time_ = now;
+
 	AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
 
 	if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
@@ -180,22 +186,13 @@ void AXARemoteCover::loop() {
 		this->publish_state();
 	}
 
-	// Send current position every 1%.
-	if (now - this->last_publish_time_ > this->unlock_duration_/100) {
-		this->publish_state(false);
-		this->last_publish_time_ = now;
-	}
+    this->publish_state(false);
 
-	// Log current position every second.
-	if (now - this->last_log_time_ > 1000) {
-		ESP_LOGV(TAG, "Current operation: %d", this->current_operation);
-		ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
-		ESP_LOGV(TAG, "Last position: %.1f%%", this->last_position_ * 100);
-		ESP_LOGV(TAG, "Target position: %.1f%%", this->target_position_ * 100);
-		ESP_LOGV(TAG, "Lock position: %.1f%%", this->lock_position_ * 100);
-
-		this->last_log_time_ = now;
-	}
+    ESP_LOGV(TAG, "Current operation: %d", this->current_operation);
+    ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
+    ESP_LOGV(TAG, "Last position: %.1f%%", this->last_position_ * 100);
+    ESP_LOGV(TAG, "Target position: %.1f%%", this->target_position_ * 100);
+    ESP_LOGV(TAG, "Lock position: %.1f%%", this->lock_position_ * 100);
 }
 
 void AXARemoteCover::control(const cover::CoverCall &call) {
@@ -308,11 +305,17 @@ bool AXARemoteCover::is_at_target_() const {
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
 	// Flush UART before sending command.
 	this->flush();
+    while(this->available()) {
+        uint8_t c;
+        this->read_byte(&c);
+    }
 
 	// Send the command.
 	if (cmd != AXACommand::STATUS) {
 		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
-	}
+    } else {
+        ESP_LOGV(TAG, "Command: %s", cmd.c_str());
+    }
 	this->write_str(cmd.c_str());
 	this->write_str("\r\n");
 
@@ -336,6 +339,8 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 					// Command echo.
 					if (cmd != AXACommand::STATUS)
 						ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
+                    else
+                        ESP_LOGV(TAG, "Command echo received: %s", response_.c_str());
 					echo_received = true;
 				} else if (response_.length() > 0) {
 					if (!echo_received && cmd != AXACommand::STATUS)
@@ -345,18 +350,21 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 						// The actual response.
 						if (cmd != AXACommand::STATUS)
 							ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
+                        else
+                            ESP_LOGV(TAG, "Response: %d %s", response_code_, response_.c_str());
 						response += response_;
 						return AXAResponseCode(response_code_);
 					} else {
 						// Garbage.
-						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
+                        ESP_LOGW(TAG, "Garbage received:");
+                        ESP_LOG_BUFFER_HEXDUMP(TAG, response_.c_str(), response_.size(), ESP_LOG_WARN);
 					}
 				}
 				response_.erase();
 			}
 		}
 
-		if (millis() - now > 25) {
+		if (millis() - now > 100) {
 			ESP_LOGE(TAG, "Timeout while waiting for response");
 			return AXAResponseCode::Invalid;
 		}
