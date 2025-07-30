@@ -97,10 +97,10 @@ void AXARemoteCover::loop() {
 	const uint32_t now = millis();
 
     //Update every 5 seconds
-    if (now - this->last_publish_time_ < 5000) {
+    if (now - this->last_update_time_ < 5000) {
         return;
     }
-    this->last_publish_time_ = now;
+    this->last_update_time_ = now;
 
 	AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
 
