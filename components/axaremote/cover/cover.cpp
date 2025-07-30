@@ -118,12 +118,29 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 
 void AXARemoteCover::loop() {
 	const uint32_t now = millis();
+    AXAResponseCode response;
+	uint32_t poll_interval;
+
+	//If a command has to be re-tried we sleep less long
+	if (this->command_to_try_.empty()) {
+		//Update @ poll_interval
+		poll_interval = this->polling_interval_;
+	} else {
+		//Update @ retry_interval
+		poll_interval = 1000;
+	}
 
 	uint32_t time_lapsed_since_last_poll = now - this->last_poll_time_;
-	if (time_lapsed_since_last_poll >= this->polling_interval_) {
+	if (time_lapsed_since_last_poll >= poll_interval) {
 		this->last_poll_time_ = now;
 
-		AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
+		//If a command has to be re-tried we do that, otherwise get status
+		if (this->command_to_try_.empty()) {
+			response = this->send_cmd_(AXACommand::STATUS);
+		} else {
+			ESP_LOGD(TAG, "Retry %s",this->command_to_try_.c_str());
+			response = this->try_cmd_(this->command_to_try_);
+		}
 
 		if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
 			// This happens when the window opener is closed with the remote.
@@ -270,14 +287,14 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 
 	switch (dir) {
 	case cover::COVER_OPERATION_IDLE:
-		this->send_cmd_(AXACommand::STOP);
+		this->try_cmd_(AXACommand::STOP);
 		this->last_position_ = this->position;
 		break;
 	case cover::COVER_OPERATION_OPENING:
 		this->last_operation_ = dir;
 		if(this->position > cover::COVER_CLOSED)
 			this->last_position_ = this->position;
-		this->send_cmd_(AXACommand::OPEN);
+		this->try_cmd_(AXACommand::OPEN);
 		break;
 	case cover::COVER_OPERATION_CLOSING:
 		this->last_operation_ = dir;
@@ -286,7 +303,7 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 		// After a power reset an open window will only close if first the open command is given
 		// this->send_cmd_(AXACommand::OPEN);
 		this->start_close_time_ = now;
-		this->send_cmd_(AXACommand::CLOSE);
+		this->try_cmd_(AXACommand::CLOSE);
 		break;
 	default:
 		return;
@@ -412,6 +429,21 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd) {
 	std::string s;
 	return this->send_cmd_(cmd, s);
+}
+
+AXAResponseCode AXARemoteCover::try_cmd_(std::string &cmd) {
+    this->command_to_try_ = cmd;
+    ESP_LOGV(TAG,"Trying %s", this->command_to_try_.c_str());
+    AXAResponseCode result = this->send_cmd_(cmd);
+
+    if (result != AXAResponseCode::Invalid) {
+        ESP_LOGV(TAG,"Command successfull %s", this->command_to_try_.c_str());
+        this->command_to_try_.clear();
+    } else {
+        ESP_LOGV(TAG,"Command failed %s", this->command_to_try_.c_str());
+    }
+
+    return result;
 }
 
 }  // namespace axaremote
