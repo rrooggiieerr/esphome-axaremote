@@ -96,10 +96,10 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 void AXARemoteCover::loop() {
 	const uint32_t now = millis();
 
-    if (now - this->last_poll_time_ < this->polling_interval_) {
-        return;
-    }
-    this->last_poll_time_ = now;
+	if (now - this->last_poll_time_ < this->polling_interval_) {
+		return;
+	}
+	this->last_poll_time_ = now;
 
 	AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
 
