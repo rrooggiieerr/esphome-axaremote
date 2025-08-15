@@ -37,8 +37,24 @@ void AXARemoteCover::setup() {
 			this->power_outage_detected_ = true;
 //			esphome::delay(10);
 //			this->send_cmd_(AXACommand::OPEN);
-//			esphome::delay(this->unlock_duration_ / 2);
-			this->send_cmd_(AXACommand::CLOSE);
+//			esphome::delay(10000);
+//			this->send_cmd_(AXACommand::CLOSE);
+//			call = this->make_call();
+//			call.set_command_close();
+//			call.perform();
+		} else if (this->position == cover::COVER_CLOSED && (response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked)) {
+			// This is as expected, no power outage occurred.
+//		} else {
+//			// After a power outage the AXA Remote will only close if first the open command is
+//			// given. If the window is partially open it's not possible to detect an power outage.
+//			ESP_LOGW(TAG, "Power outage detected");
+//			this->power_outage_detected_ = true;
+//			esphome::delay(10);
+//			this->send_cmd_(AXACommand::OPEN);
+//			esphome::delay(2000);
+//			this->send_cmd_(AXACommand::CLOSE);
+//			esphome::delay(2000);
+//			this->send_cmd_(AXACommand::STOP);
 		}
 
 		if(this->position > 0.0f) {
@@ -76,6 +92,8 @@ void AXARemoteCover::dump_config() {
 	ESP_LOGCONFIG(TAG, "  Operation: %d", this->current_operation);
 	ESP_LOGCONFIG(TAG, "  Window position: %.1f%%", this->position * 100);
 	ESP_LOGCONFIG(TAG, "  Lock position: %.1f%%", this->lock_position_ * 100);
+	if(this->power_outage_detected_)
+		ESP_LOGW(TAG, "Power outage detected");
 }
 
 cover::CoverTraits AXARemoteCover::get_traits() {
@@ -156,8 +174,9 @@ void AXARemoteCover::loop() {
 		this->lock_position_ = 0.2f;
 		this->last_recompute_time_ = now;
 		this->publish_state();
-	} else if (this->current_operation == cover::COVER_OPERATION_IDLE)
-		return;
+	} else if (this->current_operation == cover::COVER_OPERATION_IDLE) {
+//		return;
+	}
 	else if (response == AXAResponseCode::Unlocked) {
 		if(!this->lock_cleared_) {
 			ESP_LOGD(TAG, "Lock cleared on lock position %.1f%%", this->lock_position_ * 100);
@@ -177,12 +196,13 @@ void AXARemoteCover::loop() {
 			// Don't trigger stop command, let the cover stop by itself.
 			this->current_operation = cover::COVER_OPERATION_IDLE;
 			this->last_position_ = cover::COVER_OPEN;
-		} else {
+//		} else if (this->last_operation_ != cover::COVER_OPERATION_IDLE) {
+		} else if (this->last_position_ != this->position) {
 			// Trigger stop command.
 			this->start_direction_(cover::COVER_OPERATION_IDLE);
 			this->last_position_ = this->position;
 		}
-		this->publish_state();
+//		this->publish_state();
 	}
 
 	// Send current position every 1%.
@@ -193,6 +213,8 @@ void AXARemoteCover::loop() {
 
 	// Log current position every second.
 	if (now - this->last_log_time_ > 1000) {
+		if(this->power_outage_detected_)
+			ESP_LOGW(TAG, "Power outage detected");
 		ESP_LOGV(TAG, "Current operation: %d", this->current_operation);
 		ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
 		ESP_LOGV(TAG, "Last position: %.1f%%", this->last_position_ * 100);
@@ -264,6 +286,8 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 		this->last_operation_ = dir;
 		if(this->position < cover::COVER_OPEN)
 			this->last_position_ = this->position;
+		// After a power reset an open window will only close if first the open command is given
+		// this->send_cmd_(AXACommand::OPEN);
 		this->start_close_time_ = now;
 		this->send_cmd_(AXACommand::CLOSE);
 		break;
