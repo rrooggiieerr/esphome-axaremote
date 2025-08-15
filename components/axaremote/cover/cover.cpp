@@ -306,60 +306,78 @@ bool AXARemoteCover::is_at_target_() const {
 }
 
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
-	// Flush UART before sending command.
-	this->flush();
+	int retries = 0;
+	while (true) {
+		// Flush UART before sending command.
+		this->flush();
 
-	// Send the command.
-	if (cmd != AXACommand::STATUS) {
-		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
-	}
-	this->write_str(cmd.c_str());
-	this->write_str("\r\n");
-
-	// Read the response.
-	bool echo_received = false;
-	int response_code_ = 0;
-	std::string response_;
-	const uint32_t now = millis();
-	while(true) {
-		if(this->available() > 0) {
+		// Clear the serial buffer
+		while(this->available()) {
 			uint8_t c;
 			this->read_byte(&c);
-			if (response_.length() == 0 && c >= '0' && c <= '9')
-				response_code_ = (response_code_ * 10) + (c - '0');
-			else if (c == ' ' && response_.length() == 0) {
-				// Do nothing.
-			} else if (c != '\r' && c != '\n')
-				response_ += c;
-			if (c == '\n' || !this->available()) {
-				if (response_ == cmd) {
-					// Command echo.
-					if (cmd != AXACommand::STATUS)
-						ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
-					echo_received = true;
-				} else if (response_.length() > 0) {
-					if (!echo_received && cmd != AXACommand::STATUS)
-						ESP_LOGW(TAG, "No command echo received");
+		}
 
-					if (response_code_ >= int(AXAResponseCode::OK) && response_code_ <= int(AXAResponseCode::Error)) {
-						// The actual response.
+		// Send the command.
+		if (cmd != AXACommand::STATUS) {
+			ESP_LOGD(TAG, "Command: %s", cmd.c_str());
+		}
+		this->write_str(cmd.c_str());
+		this->write_str("\r\n");
+
+		// Flush UART.
+		this->flush();
+
+		// Read the response.
+		bool echo_received = false;
+		int response_code_ = 0;
+		std::string response_;
+		const uint32_t now = millis();
+		while(true) {
+			if(this->available() > 0) {
+				uint8_t c;
+				this->read_byte(&c);
+				if (response_.length() == 0 && c >= '0' && c <= '9')
+					response_code_ = (response_code_ * 10) + (c - '0');
+				else if (c == ' ' && response_.length() == 0) {
+					// Do nothing.
+				} else if (c != '\r' && c != '\n')
+					response_ += c;
+				if (c == '\n' || !this->available()) {
+					if (response_ == cmd) {
+						// Command echo.
 						if (cmd != AXACommand::STATUS)
-							ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
-						response += response_;
-						return AXAResponseCode(response_code_);
-					} else {
-						// Garbage.
-						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
+							ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
+						echo_received = true;
+					} else if (response_.length() > 0) {
+						if (!echo_received && cmd != AXACommand::STATUS)
+							ESP_LOGW(TAG, "No command echo received");
+
+						if (response_code_ >= int(AXAResponseCode::OK) && response_code_ <= int(AXAResponseCode::Error)) {
+							// The actual response.
+							if (cmd != AXACommand::STATUS)
+								ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
+							response += response_;
+							return AXAResponseCode(response_code_);
+						} else {
+							// Garbage.
+							ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
+						}
 					}
+					response_.erase();
 				}
-				response_.erase();
+			}
+			if (millis() - now > 25) {
+				ESP_LOGE(TAG, "Timeout while waiting for response");
+				break;
 			}
 		}
 
-		if (millis() - now > 25) {
+		if (retries == 5) {
 			ESP_LOGE(TAG, "Timeout while waiting for response");
-			return AXAResponseCode::Invalid;
+			break;
 		}
+		retries++;
+		esphome::delay(10);
 	}
 
 	return AXAResponseCode::Invalid;
