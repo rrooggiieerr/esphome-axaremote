@@ -9,14 +9,6 @@ static const char *const TAG = "axaremote.cover";
 void AXARemoteCover::setup() {
 	ESP_LOGCONFIG(TAG, "Setting up AXA Remote cover...");
 
-	// Clear the serial buffer
-	this->write_str("\r\n");
-	esphome::delay(20);
-	while(this->available() > 0) {
-		uint8_t c;
-		this->read_byte(&c);
-	}
-
 	this->send_cmd_(AXACommand::DEVICE, this->device);
 	ESP_LOGCONFIG(TAG, "  Device: %s", this->device.c_str());
 	this->send_cmd_(AXACommand::VERSION, this->version);
