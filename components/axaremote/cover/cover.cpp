@@ -20,9 +20,22 @@ void AXARemoteCover::setup() {
 		restore->apply(this);
 		ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
 		ESP_LOGI(TAG, "Current operation: %d", this->current_operation);
-		if (this->position == cover::COVER_CLOSED && this->current_operation == cover::COVER_OPERATION_IDLE && this->send_cmd_(AXACommand::STATUS) == AXAResponseCode::Unlocked) {
-			// After a power outage the AXA Remote always returns "Unlocked", even when the window is supposed to be closed.
-			// This can only be solved by opening and closing the window.
+
+		AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
+
+		if (this->position == cover::COVER_OPEN) {
+			// After a power outage the AXA Remote will only close if first the open command is
+			// given. If the window is fully open we can safely give an other open command without
+			// influencing the actual window position.
+			esphome::delay(10);
+			this->send_cmd_(AXACommand::OPEN);
+		} else if (this->position == cover::COVER_CLOSED and response == AXAResponseCode::Unlocked) {
+			// After a power outage the AXA Remote always reports the lock state as unlocked even
+			// when the window is closed and locked. Only opening and then closing the window will
+			// reset the lock state.
+			ESP_LOGW(TAG, "Power outage detected");
+			this->power_outage_detected_ = true;
+//			esphome::delay(10);
 //			this->send_cmd_(AXACommand::OPEN);
 //			esphome::delay(this->unlock_duration_ / 2);
 			this->send_cmd_(AXACommand::CLOSE);
