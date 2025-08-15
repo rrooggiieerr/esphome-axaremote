@@ -42,6 +42,7 @@ public:
 	void setup() override;
 	void dump_config() override;
 	cover::CoverTraits get_traits() override;
+	void set_polling_interval(uint32_t polling_interval) { this->polling_interval_ = polling_interval; }
 	void set_close_duration(uint32_t close_duration);
 	void set_auto_calibrate(bool auto_calibrate) { this->auto_calibrate_ = auto_calibrate; }
 	void loop();
@@ -54,9 +55,11 @@ protected:
 	float open_duration_;
 	float close_duration_;
 	float lock_duration_;
+	uint32_t polling_interval_;
 	bool auto_calibrate_ = false;
 	bool power_outage_detected_ = false;
 
+	uint32_t last_poll_time_{0};
 	uint32_t last_recompute_time_{0};
 	uint32_t start_close_time_{0};
 	uint32_t last_publish_time_{0};

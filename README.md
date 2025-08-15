@@ -141,10 +141,17 @@ cover:
 
 ### Configuration variables:
 
+- __polling_interval__ (Optional): The time between status update requests from the AXA Remote. Defaults to 0s.
 - __close_duration__ (Optional): The close duration from fully open to fully locked. From this time
   the unlock, open, close and lock durations are derived.
 - __auto_calibrate__ (Optional): Enable/disable auto calibration of the unlock, open, close and
   lock durations.
+
+#### Model differences
+
+There exist two models of the AXA Remote 2.0: A single motor and a dual (synchronous) motor. The dual motor version keeps the motors in sync using the same LIN-bus that's used for the communication of this integration. Therefore some adjustment to the default configuration is needed:
+
+- __polling_interval__: Recommended to be at least 5s.
 
 ### Calibration
 

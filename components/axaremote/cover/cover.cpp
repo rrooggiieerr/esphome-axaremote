@@ -119,109 +119,106 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 void AXARemoteCover::loop() {
 	const uint32_t now = millis();
 
-	AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
+	uint32_t time_lapsed_since_last_poll = now - this->last_poll_time_;
+	if (time_lapsed_since_last_poll >= this->polling_interval_) {
+		this->last_poll_time_ = now;
 
-	if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
-		// This happens when the window opener is closed with the remote.
-		ESP_LOGD(TAG, "Closed with remote?");
+		AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
 
-		this->position = cover::COVER_CLOSED;
-		this->last_position_ = cover::COVER_CLOSED;
-		this->lock_position_ = LOCK_CLOSED;
-		this->lock_cleared_ = false;
-		this->current_operation = cover::COVER_OPERATION_IDLE;
-		this->publish_state();
+		if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
+			// This happens when the window opener is closed with the remote.
+			ESP_LOGD(TAG, "Closed with remote?");
 
-		return;
-	} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && !this->lock_cleared_) {
-		// When the window is being opened by the ESP from the closed position the first couple of
-		// status responses will still be StrongLocked/WeakLocked. Ignore and continue.
-	} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && this->lock_cleared_) {
-		// This happens when the window is being opened, but then closed with the remote.
-		ESP_LOGD(TAG, "Closed with remote while opening?");
-
-		this->position = cover::COVER_CLOSED;
-		this->last_position_ = cover::COVER_CLOSED;
-		this->lock_position_ = LOCK_CLOSED;
-		this->lock_cleared_ = false;
-		this->current_operation = cover::COVER_OPERATION_IDLE;
-		this->publish_state();
-
-		return;
-	} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_CLOSING) {
-		if(this->last_position_ == cover::COVER_OPEN) {
-			// Only calculate the full close duration when the last position has been fully open.
-			uint32_t close_duration = now - this->start_close_time_;
-			ESP_LOGI(TAG, "Full Close Duration: %.1fs", close_duration / 1e3f);
-			if (this->auto_calibrate_)
-				this->set_close_duration(close_duration);
-		}
-
-		this->position = cover::COVER_CLOSED;
-		this->last_position_ = cover::COVER_CLOSED;
-		this->lock_position_ = LOCK_CLOSED;
-		this->lock_cleared_ = false;
-		this->current_operation = cover::COVER_OPERATION_IDLE;
-		this->publish_state();
-
-		return;
-	} else if (response == AXAResponseCode::Unlocked && this->position == cover::COVER_CLOSED && this->current_operation == cover::COVER_OPERATION_IDLE) {
-		// This happens when the window opener is opened with the remote.
-		ESP_LOGD(TAG, "Opened with remote?");
-		this->position = cover::COVER_CLOSED;
-		this->last_position_ = cover::COVER_CLOSED;
-		this->current_operation = cover::COVER_OPERATION_OPENING;
-		this->lock_position_ = 0.2f;
-		this->last_recompute_time_ = now;
-		this->publish_state();
-	} else if (this->current_operation == cover::COVER_OPERATION_IDLE) {
-//		return;
-	}
-	else if (response == AXAResponseCode::Unlocked) {
-		if(!this->lock_cleared_) {
-			ESP_LOGD(TAG, "Lock cleared on lock position %.1f%%", this->lock_position_ * 100);
-		}
-		this->lock_cleared_ = true;
-	} else {
-		ESP_LOGV(TAG, "Response: %d", response);
-	}
-
-	// Recompute position every loop cycle.
-	this->recompute_position_();
-
-	if (this->is_at_target_()) {
-		if (this->target_position_ == cover::COVER_CLOSED) {
-			// Don't trigger stop and don't idle, let the cover stop and idle by response StrongLocked/WeakLocked.
-		} else if (this->target_position_ == cover::COVER_OPEN) {
-			// Don't trigger stop command, let the cover stop by itself.
+			this->position = cover::COVER_CLOSED;
+			this->last_position_ = cover::COVER_CLOSED;
+			this->lock_position_ = LOCK_CLOSED;
+			this->lock_cleared_ = false;
 			this->current_operation = cover::COVER_OPERATION_IDLE;
-			this->last_position_ = cover::COVER_OPEN;
-//		} else if (this->last_operation_ != cover::COVER_OPERATION_IDLE) {
-		} else if (this->last_position_ != this->position) {
-			// Trigger stop command.
-			this->start_direction_(cover::COVER_OPERATION_IDLE);
-			this->last_position_ = this->position;
+			this->publish_state();
+		} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && !this->lock_cleared_) {
+			// When the window is being opened by the ESP from the closed position the first couple of
+			// status responses will still be StrongLocked/WeakLocked. Ignore and continue.
+		} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && this->lock_cleared_) {
+			// This happens when the window is being opened, but then closed with the remote.
+			ESP_LOGD(TAG, "Closed with remote while opening?");
+
+			this->position = cover::COVER_CLOSED;
+			this->last_position_ = cover::COVER_CLOSED;
+			this->lock_position_ = LOCK_CLOSED;
+			this->lock_cleared_ = false;
+			this->current_operation = cover::COVER_OPERATION_IDLE;
+			this->publish_state();
+		} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_CLOSING) {
+			if(this->last_position_ == cover::COVER_OPEN) {
+				// Only calculate the full close duration when the last position has been fully open.
+				uint32_t close_duration = now - this->start_close_time_;
+				ESP_LOGI(TAG, "Full Close Duration: %.1fs", close_duration / 1e3f);
+				if (this->auto_calibrate_)
+					this->set_close_duration(close_duration);
+			}
+
+			this->position = cover::COVER_CLOSED;
+			this->last_position_ = cover::COVER_CLOSED;
+			this->lock_position_ = LOCK_CLOSED;
+			this->lock_cleared_ = false;
+			this->current_operation = cover::COVER_OPERATION_IDLE;
+			this->publish_state();
+		} else if (response == AXAResponseCode::Unlocked && this->position == cover::COVER_CLOSED && this->current_operation == cover::COVER_OPERATION_IDLE) {
+			// This happens when the window opener is opened with the remote.
+			ESP_LOGD(TAG, "Opened with remote?");
+			this->position = cover::COVER_CLOSED;
+			this->last_position_ = cover::COVER_CLOSED;
+			this->current_operation = cover::COVER_OPERATION_OPENING;
+			this->lock_position_ = 0.2f;
+			this->last_recompute_time_ = now;
+			this->publish_state();
+		} else if (response == AXAResponseCode::Unlocked) {
+			if(!this->lock_cleared_) {
+				ESP_LOGD(TAG, "Lock cleared on lock position %.1f%%", this->lock_position_ * 100);
+			}
+			this->lock_cleared_ = true;
+		} else {
+			ESP_LOGV(TAG, "Response: %d", response);
 		}
-//		this->publish_state();
 	}
 
-	// Send current position every 1%.
-	if (now - this->last_publish_time_ > this->unlock_duration_/100) {
-		this->publish_state(false);
-		this->last_publish_time_ = now;
-	}
+	if (this->current_operation != cover::COVER_OPERATION_IDLE) {
+		// Recompute position every loop cycle during movement.
+		this->recompute_position_();
 
-	// Log current position every second.
-	if (now - this->last_log_time_ > 1000) {
-		if(this->power_outage_detected_)
-			ESP_LOGW(TAG, "Power outage detected");
-		ESP_LOGV(TAG, "Current operation: %d", this->current_operation);
-		ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
-		ESP_LOGV(TAG, "Last position: %.1f%%", this->last_position_ * 100);
-		ESP_LOGV(TAG, "Target position: %.1f%%", this->target_position_ * 100);
-		ESP_LOGV(TAG, "Lock position: %.1f%%", this->lock_position_ * 100);
+		if (this->is_at_target_()) {
+			if (this->target_position_ == cover::COVER_CLOSED) {
+				// Don't trigger stop and don't idle, let the cover stop and idle by response StrongLocked/WeakLocked.
+			} else if (this->target_position_ == cover::COVER_OPEN) {
+				// Don't trigger stop command, let the cover stop by itself.
+				this->current_operation = cover::COVER_OPERATION_IDLE;
+				this->last_position_ = cover::COVER_OPEN;
+			} else if (this->last_position_ != this->position) {
+				// Trigger stop command.
+				this->start_direction_(cover::COVER_OPERATION_IDLE);
+				this->last_position_ = this->position;
+			}
+			this->publish_state();
+		}
 
-		this->last_log_time_ = now;
+		// Send current position every 1%.
+		if (now - this->last_publish_time_ > this->unlock_duration_/100) {
+			this->publish_state(false);
+			this->last_publish_time_ = now;
+		}
+
+		// Log current position every second.
+		if (now - this->last_log_time_ > 1000) {
+			if(this->power_outage_detected_)
+				ESP_LOGW(TAG, "Power outage detected");
+			ESP_LOGV(TAG, "Current operation: %d", this->current_operation);
+			ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
+			ESP_LOGV(TAG, "Last position: %.1f%%", this->last_position_ * 100);
+			ESP_LOGV(TAG, "Target position: %.1f%%", this->target_position_ * 100);
+			ESP_LOGV(TAG, "Lock position: %.1f%%", this->lock_position_ * 100);
+
+			this->last_log_time_ = now;
+		}
 	}
 }
 
