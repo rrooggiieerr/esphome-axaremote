@@ -11,7 +11,9 @@
 ## Introduction
 
 This [ESPHome External Component](https://esphome.io/components/external_components) lets you
-control an AXA Remote window opener.
+control an AXA Remote window opener by wire.
+
+<img src="AXA Remote.jpg"/>
 
 Features:
 - Open/Stop/Close the window
@@ -19,14 +21,33 @@ Features:
 - Calibrate the open/close timings
 - Use remote control simultaneously
 
-### Using the remote control
+### About the AXA Remote
 
-The AXA Remote only reports if the device is locked or unlocked. When using the remote control to
-open the window from a closed position the integration can detect this and report the state
-accordingly. The same applies for closing the window with the remote control till a fully closed
-position. However stopping the window or partially opening/closing the window with the remote
-control can not be detected and the exact position the window is opened at will not correspond with
-the real position.
+The AXA Remote is a chain actuator driven electronic window opener that comes with an infrared
+remote controll. It is mounted in the window frame.
+
+## AXA Remote models
+
+### AXA Remote RV2900
+
+The original AXA Remote what was introduced in 2008 or earlier. It has a plastic frame and housing.
+It is unknow if it can be controlled by wire. If you have more information on this device let me
+know!
+
+### AXA Remote 2.0
+
+The successor to the original AXA Remote introduced in 2011(?). It has increased burglar resistance.
+The frame is made of zamac, a zinc aluminium alloy while the housing remains plastic. It uses two
+motors, one to unlock and an other to open the window. This is the model that I used to develop this
+ESPHome External Component.
+
+### AXA Remote 2.0S
+
+A synchronised version AXA Remote 2.0 that keeps a second window opener in sync with a master
+window operen. The intended use are large windows that need more power to open. The synchronisation
+is done by sending synchronisation messages back and forth between the window openers. This ESPHome
+External Component uses the same wired bus these synchronisation messages us and interferes with
+these messages.
 
 ## Hardware required:
 
@@ -54,14 +75,33 @@ the same pin on the other connector. The pinout is as follows:
 
 Wiring a LIN-bus controller as level converter goes as follows:
 
-<img src="schematic.png" width="33%"/>
+<img src="schematic.png" width="50%"/>
 
 ### Powering the AXA Remote
 
-The outer pins of the RJ25 are the + voltage input and pin 2/5 the 0 voltage. The official AXA
-Remote power supply delivers 7.5 Volt, however the device also seems to work fine on 9 Volt. The
-voltage does influence the speed and noise of the device, a lower voltage runs the device slower
-and less noisy while a higher voltage faster and noisier.
+The AXA Remote can be powered using 4 AA batteries or an external power supply which connects to
+the RJ25 plug on the window opener. The outer pins of the RJ25 are the + voltage input and pin 2/5
+are ground. The official AXA Remote power supply delivers 7.5 Volt, however the device also seems
+to work fine on 9 Volt. The voltage does influence the speed and noise of the device, a lower
+voltage runs the device slower and less noisy while a higher voltage faster and noisier.
+
+While this ESPHome External Component should work with a battery powered AXA Remote when the ESP is
+powered externally it makes more sense to power the AXA Remote using an external power supply and
+power the ESP directly from the AXA Remote using a voltage regulator. Some voltage regulators on
+ESP boards are actually quite tolerant regarding the input voltage and could be powered directly
+from the AXA Remote input voltage. Your mileage may vary and do this at your own risk.
+
+## PCB
+
+I designed a PCB that fits in the battery bay of the AXA Remote and can controll 2 window openers.
+Only minor modifications to the battery bay are needed. Contact me if you like to buy one! You can
+find my email address on [my GitHub profile](https://github.com/rrooggiieerr).
+
+<img src="PCB.png"/>
+
+PCB in the battery bay:
+
+<img src="PCB in battery bay.png"/>
 
 ## Protocol
 
@@ -85,14 +125,24 @@ Each command is ended with a carriage return and newline `\r\n`.
 - Strong Locked
 - Weak Locked
 
-### Quirks
+## Using the remote control
+
+The AXA Remote only reports back if the device is locked or unlocked. When using the remote control
+to open the window from a closed position the integration can detect this and report the state
+accordingly. The same applies for closing the window with the remote control till a fully closed
+position. However stopping the window or partially opening/closing the window with the remote
+control can not be detected and the exact position the window is opened at will not correspond with
+the real position.
+
+## Quirks
 
 The AXA Remote firmware has some nasty quirks. 
 
 After a power outage the AXA Remote always reports the lock state as unlocked even when the window
 is closed and locked. Only opening and then closing the window will reset the lock state.
 
-After a power outage the AXA Remote will only close if first the open command is given.
+After a power outage the AXA Remote will only close if first the open command is given even when
+the window is fully open.
 
 ## ESPHome example configuration:
 ```
@@ -141,17 +191,26 @@ cover:
 
 ### Configuration variables:
 
-- __polling_interval__ (Optional): The time between status update requests from the AXA Remote. Defaults to 0s.
 - __close_duration__ (Optional): The close duration from fully open to fully locked. From this time
   the unlock, open, close and lock durations are derived.
 - __auto_calibrate__ (Optional): Enable/disable auto calibration of the unlock, open, close and
   lock durations.
+- __polling_interval__ (Optional): The time between status update requests from the AXA Remote.
+  Defaults to 0s (continuous polling). __auto_calibrate__ will not be accurate with a reduced
+  polling interval.
 
-#### Model differences
+### Model specific configuration for the AXA Remote 2.0S
 
-There exist two models of the AXA Remote 2.0: A single motor and a dual (synchronous) motor. The dual motor version keeps the motors in sync using the same LIN-bus that's used for the communication of this integration. Therefore some adjustment to the default configuration is needed:
+To reduce the interference of this ESPHome External Component with the synchronisation messages of
+the AXA Remote 2.0S it is recommended to use a reduced polling interval of 5 seconds or more.
 
-- __polling_interval__: Recommended to be at least 5s.
+```
+cover:
+  - platform: axaremote
+    name: "AXA Remote 2.0S"
+    close_duration: 50s
+    polling_interval: 5s
+```
 
 ### Calibration
 
