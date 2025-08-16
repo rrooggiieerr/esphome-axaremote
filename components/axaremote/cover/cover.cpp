@@ -127,7 +127,7 @@ void AXARemoteCover::loop() {
 		poll_interval = this->polling_interval_;
 	} else {
 		//Update @ retry_interval
-		poll_interval = 1000;
+		poll_interval = this->retry_interval_;
 	}
 
 	uint32_t time_lapsed_since_last_poll = now - this->last_poll_time_;

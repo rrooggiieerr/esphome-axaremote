@@ -198,11 +198,12 @@ cover:
 - __polling_interval__ (Optional): The time between status update requests from the AXA Remote.
   Defaults to 0s (continuous polling). __auto_calibrate__ will not be accurate with a reduced
   polling interval.
+- __retry_interval__ (Optional): The time between retries in case a command fails to be transmitted. Defaults to 0s.
 
 ### Model specific configuration for the AXA Remote 2.0S
 
 To reduce the interference of this ESPHome External Component with the synchronisation messages of
-the AXA Remote 2.0S it is recommended to use a reduced polling interval of 5 seconds or more.
+the AXA Remote 2.0S it is recommended to use a reduced polling interval of 5 seconds or more and a retry interval of 1 second or more.
 
 ```
 cover:
@@ -210,6 +211,7 @@ cover:
     name: "AXA Remote 2.0S"
     close_duration: 50s
     polling_interval: 5s
+    retry_interval: 1s
 ```
 
 ### Calibration
