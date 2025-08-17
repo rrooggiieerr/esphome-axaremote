@@ -69,6 +69,7 @@ protected:
 	float lock_position_{0};
 	bool lock_cleared_ = false;
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
+	std::string *cmd_;
 
 	void control(const cover::CoverCall &call) override;
 	bool is_at_target_() const;
@@ -79,6 +80,7 @@ protected:
 
 	AXAResponseCode send_cmd_(std::string &cmd, std::string &response);
 	AXAResponseCode send_cmd_(std::string &cmd);
+	AXAResponseCode execute_cmd_(std::string &cmd);
 };
 
 }  // namespace axaremote

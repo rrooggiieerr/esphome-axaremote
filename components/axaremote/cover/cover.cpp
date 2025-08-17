@@ -117,8 +117,15 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 }
 
 void AXARemoteCover::loop() {
-	const uint32_t now = millis();
+	if(this->cmd_ != nullptr) {
+		ESP_LOGD(TAG, "Command waiting to be executed");
+		AXAResponseCode response = this->execute_cmd_(*this->cmd_);
+		if(response != AXAResponseCode::OK)
+			return;
+		this->cmd_ = nullptr;
+	}
 
+	const uint32_t now = millis();
 	uint32_t time_lapsed_since_last_poll = now - this->last_poll_time_;
 	if (time_lapsed_since_last_poll >= this->polling_interval_) {
 		this->last_poll_time_ = now;
@@ -268,29 +275,26 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 	const uint32_t now = millis();
 	this->last_recompute_time_ = now;
 
+	std::string *cmd;
 	switch (dir) {
 	case cover::COVER_OPERATION_IDLE:
-		this->send_cmd_(AXACommand::STOP);
-		this->last_position_ = this->position;
+		cmd = &AXACommand::STOP;
 		break;
 	case cover::COVER_OPERATION_OPENING:
+		cmd = &AXACommand::OPEN;
 		this->last_operation_ = dir;
-		if(this->position > cover::COVER_CLOSED)
-			this->last_position_ = this->position;
-		this->send_cmd_(AXACommand::OPEN);
 		break;
 	case cover::COVER_OPERATION_CLOSING:
+		cmd = &AXACommand::CLOSE;
 		this->last_operation_ = dir;
-		if(this->position < cover::COVER_OPEN)
-			this->last_position_ = this->position;
-		// After a power reset an open window will only close if first the open command is given
-		// this->send_cmd_(AXACommand::OPEN);
-		this->start_close_time_ = now;
-		this->send_cmd_(AXACommand::CLOSE);
 		break;
 	default:
 		return;
 	}
+
+	AXAResponseCode response = this->execute_cmd_(*cmd);
+	if(response != AXAResponseCode::OK)
+		this->cmd_ = cmd;
 }
 
 void AXARemoteCover::recompute_position_() {
@@ -332,78 +336,68 @@ bool AXARemoteCover::is_at_target_() const {
 }
 
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
-	int retries = 0;
-	while (true) {
-		// Flush UART before sending command.
-		this->flush();
+	// Flush UART before sending command.
+	this->flush();
 
-		// Clear the serial buffer
-		while(this->available()) {
+	// Clear the serial buffer
+	while(this->available()) {
+		uint8_t c;
+		this->read_byte(&c);
+	}
+
+	// Send the command.
+	if (cmd != AXACommand::STATUS) {
+		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
+	}
+	this->write_str(cmd.c_str());
+	this->write_str("\r\n");
+
+	// Flush UART.
+	this->flush();
+
+	// Read the response.
+	bool echo_received = false;
+	int response_code_ = 0;
+	std::string response_;
+	const uint32_t now = millis();
+	while(true) {
+		if(this->available() > 0) {
 			uint8_t c;
 			this->read_byte(&c);
-		}
+			if (response_.length() == 0 && c >= '0' && c <= '9')
+				response_code_ = (response_code_ * 10) + (c - '0');
+			else if (c == ' ' && response_.length() == 0) {
+				// Do nothing.
+			} else if (c != '\r' && c != '\n')
+				response_ += c;
+			if (c == '\n' || !this->available()) {
+				if (response_ == cmd) {
+					// Command echo.
+					if (cmd != AXACommand::STATUS)
+						ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
+					echo_received = true;
+				} else if (response_.length() > 0) {
+					if (!echo_received && cmd != AXACommand::STATUS)
+						ESP_LOGW(TAG, "No command echo received");
 
-		// Send the command.
-		if (cmd != AXACommand::STATUS) {
-			ESP_LOGD(TAG, "Command: %s", cmd.c_str());
-		}
-		this->write_str(cmd.c_str());
-		this->write_str("\r\n");
-
-		// Flush UART.
-		this->flush();
-
-		// Read the response.
-		bool echo_received = false;
-		int response_code_ = 0;
-		std::string response_;
-		const uint32_t now = millis();
-		while(true) {
-			if(this->available() > 0) {
-				uint8_t c;
-				this->read_byte(&c);
-				if (response_.length() == 0 && c >= '0' && c <= '9')
-					response_code_ = (response_code_ * 10) + (c - '0');
-				else if (c == ' ' && response_.length() == 0) {
-					// Do nothing.
-				} else if (c != '\r' && c != '\n')
-					response_ += c;
-				if (c == '\n' || !this->available()) {
-					if (response_ == cmd) {
-						// Command echo.
+					if (response_code_ >= int(AXAResponseCode::OK) && response_code_ <= int(AXAResponseCode::Error)) {
+						// The actual response.
 						if (cmd != AXACommand::STATUS)
-							ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
-						echo_received = true;
-					} else if (response_.length() > 0) {
-						if (!echo_received && cmd != AXACommand::STATUS)
-							ESP_LOGW(TAG, "No command echo received");
-
-						if (response_code_ >= int(AXAResponseCode::OK) && response_code_ <= int(AXAResponseCode::Error)) {
-							// The actual response.
-							if (cmd != AXACommand::STATUS)
-								ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
-							response += response_;
-							return AXAResponseCode(response_code_);
-						} else {
-							// Garbage.
-							ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
-						}
+							ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
+						response += response_;
+						return AXAResponseCode(response_code_);
+					} else {
+						// Garbage.
+						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
 					}
-					response_.erase();
 				}
-			}
-			if (millis() - now > 25) {
-				ESP_LOGE(TAG, "Timeout while waiting for response");
-				break;
+				response_.erase();
 			}
 		}
-
-		if (retries == 5) {
+		if (millis() - now > 25) {
 			ESP_LOGE(TAG, "Timeout while waiting for response");
 			break;
 		}
-		retries++;
-		esphome::delay(10);
 	}
 
 	return AXAResponseCode::Invalid;
@@ -412,6 +406,27 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd) {
 	std::string s;
 	return this->send_cmd_(cmd, s);
+}
+
+AXAResponseCode AXARemoteCover::execute_cmd_(std::string &cmd) {
+	const uint32_t now = millis();
+	this->last_recompute_time_ = now;
+
+	AXAResponseCode response = this->send_cmd_(cmd);
+	if(response == AXAResponseCode::OK) {
+		if(cmd == AXACommand::STOP) {
+			this->last_position_ = this->position;
+		} else if(cmd == AXACommand::OPEN) {
+			if(this->position > cover::COVER_CLOSED)
+				this->last_position_ = this->position;
+		} else if(cmd == AXACommand::CLOSE) {
+			if(this->position < cover::COVER_OPEN)
+				this->last_position_ = this->position;
+			this->start_close_time_ = now;
+		}
+	}
+
+	return response;
 }
 
 }  // namespace axaremote
