@@ -30,14 +30,14 @@ remote controll. It is mounted in the window frame.
 
 ### AXA Remote RV2900
 
-The original AXA Remote what was introduced in 2008 or earlier. It has a plastic frame and housing.
+The original AXA Remote what was introduced in 2008 (or earlier?). It has a plastic frame and casing.
 It is unknow if it can be controlled by wire. If you have more information on this device let me
 know!
 
 ### AXA Remote 2.0
 
 The successor to the original AXA Remote introduced in 2011(?). It has increased burglar resistance.
-The frame is made of zamac, a zinc aluminium alloy while the housing remains plastic. It uses two
+The frame is made of zamac, a zinc aluminium alloy while the casing remains plastic. It uses two
 motors, one to unlock and an other to open the window. This is the model that I used to develop this
 ESPHome External Component.
 
@@ -46,7 +46,7 @@ ESPHome External Component.
 A synchronised version AXA Remote 2.0 that keeps a second window opener in sync with a master
 window operen. The intended use are large windows that need more power to open. The synchronisation
 is done by sending synchronisation messages back and forth between the window openers. This ESPHome
-External Component uses the same wired bus these synchronisation messages us and interferes with
+External Component uses the same wired bus these synchronisation messages use and interferes with
 these messages.
 
 ## Hardware required:
@@ -109,8 +109,8 @@ This are the protocol details:
 
 Serial port settings: 19200 baud 8N2  
 
-Device command: `DEVICE`, returns the device type, `AXA RV2900 2.0` on my device.  
-Version command: `VERSION`, returns the firmware version of the AXA Remote.  
+Device command: `DEVICE`, returns the device type, `AXA RV2900 2.0` on my AXA Remote 2.0 device.  
+Version command: `VERSION`, returns the firmware version of the AXA Remote, `Firmware V1.20 2012` on my AXA Remote 2.0 device.  
 Status command: `STATUS`, returns the current lock state.  
 Open command: `OPEN`, opens the window opener.  
 Stop command: `STOP`, stops the window opener.  
