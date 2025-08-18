@@ -1,0 +1,122 @@
+# These substitutions allow the end user to override certain values
+substitutions:
+  name: "axa-remote"
+  friendly_name: "AXA Remote"
+
+esphome:
+  name: "${name}"
+  friendly_name: "${friendly_name}"
+  # Automatically add the mac address to the name
+  # so a single firmware can be used for all devices
+  name_add_mac_suffix: true
+  project:
+    name: "rrooggiieerr.axaremote"
+    version: "0.0.1"
+
+  # Define devices
+  devices:
+    - id: axa_1
+      name: "AXA 1"
+    - id: axa_2
+      name: "AXA 2"
+
+external_components:
+  - source: github://rrooggiieerr/esphome-axaremote
+    refresh: 0s
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  - platform: esphome
+
+# This points to the public location of this yaml file.
+dashboard_import:
+  package_import_url: github://rrooggiieerr/esphome-axaremote/axa-remote-pcb.yaml
+  import_full_config: false
+
+wifi:
+  # Set up a wifi access point
+  ap:
+    password: "axaremote"
+
+# In combination with the `ap` this allows the user
+# to provision wifi credentials to the device.
+captive_portal:
+
+# Set up Bluetooth LE to allow the user
+# to provision wifi credentials to the device.
+esp32_improv:
+  authorizer: flash_button
+
+# Sets up the improv via serial client for Wi-Fi provisioning
+improv_serial:
+  next_url: https://github.com/rrooggiieerr/esphome-axaremote
+
+status_led:
+  pin:
+    number: GPIO2
+    inverted: False
+
+uart:
+  - id: uart_axa1
+    tx_pin: GPIO17
+    rx_pin: GPIO16
+    baud_rate: 19200
+    stop_bits: 2
+  - id: uart_axa2
+    tx_pin: GPIO23
+    rx_pin: GPIO22
+    baud_rate: 19200
+    stop_bits: 2
+
+sensor:
+  - platform: adc
+    id: brightness
+    device_id: axa_1
+    name: "Brightness"
+    pin: GPIO33
+    device_class: illuminance
+    attenuation: auto
+    update_interval: 10s
+    unit_of_measurement: "%"
+    icon: "mdi:brightness-5"
+    accuracy_decimals: 1
+    filters:
+    #   # 0.075 V = 0%
+    #   # 3.14853 V = 100%
+      - lambda: return ((x - 0.075) / (3.14853 - 0.075)) * 100;
+
+binary_sensor:
+  - platform: gpio
+    id: flash_button
+    pin:
+      number: GPIO0
+      mode:
+        input: True
+        pullup: True
+      inverted: True
+    internal: True
+
+button:
+  - platform: factory_reset
+    name: Restart with Factory Default Settings
+    disabled_by_default: True
+
+cover:
+  - platform: axaremote
+    name: "Window 1"
+    id: cover_axa1
+    device_id: axa_1
+    device_class: window
+    uart_id: uart_axa1
+    close_duration: 40s
+    auto_calibrate: True

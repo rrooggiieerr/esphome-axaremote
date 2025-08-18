@@ -91,17 +91,14 @@ power the ESP directly from the AXA Remote using a voltage regulator. Some volta
 ESP boards are actually quite tolerant regarding the input voltage and could be powered directly
 from the AXA Remote input voltage. Your mileage may vary and do this at your own risk.
 
-## PCB
+### PCB
 
-I designed a PCB that fits in the battery bay of the AXA Remote and can controll 2 window openers.
-Only minor modifications to the battery bay are needed. Contact me if you like to buy one! You can
-find my email address on [my GitHub profile](https://github.com/rrooggiieerr).
+I designed a PCB that fits in the battery compartment of the AXA Remote and can controll up to two
+window openers. Only minor modifications to the battery compartment are needed.
 
 <img src="PCB.png"/>
 
-PCB in the battery bay:
-
-<img src="PCB in battery bay.png"/>
+[Read more about the PCB](PCB.md)
 
 ## Protocol
 
@@ -144,7 +141,8 @@ is closed and locked. Only opening and then closing the window will reset the lo
 After a power outage the AXA Remote will only close if first the open command is given even when
 the window is fully open.
 
-## ESPHome example configuration:
+## ESPHome example configuration
+
 ```
 esphome:
   name: axaremote
