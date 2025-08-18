@@ -82,7 +82,6 @@ protected:
 	AXAResponseCode send_cmd_(std::string &cmd, std::string &response, int max_retries);
 	AXAResponseCode send_cmd_(std::string &cmd);
 	AXAResponseCode send_cmd_(std::string &cmd, int max_retries);
-	AXAResponseCode execute_cmd_(std::string &cmd);
 };
 
 }  // namespace axaremote
