@@ -59,7 +59,7 @@ protected:
 	bool auto_calibrate_ = false;
 	bool power_outage_detected_ = false;
 
-	uint32_t last_poll_time_{0};
+	uint32_t last_cmd_{0};
 	uint32_t last_recompute_time_{0};
 	uint32_t start_close_time_{0};
 	uint32_t last_publish_time_{0};
@@ -69,7 +69,7 @@ protected:
 	float lock_position_{0};
 	bool lock_cleared_ = false;
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
-	std::string *cmd_;
+	cover::CoverOperation *retry_operation_;
 
 	void control(const cover::CoverCall &call) override;
 	bool is_at_target_() const;
@@ -79,7 +79,9 @@ protected:
 	void recompute_position_();
 
 	AXAResponseCode send_cmd_(std::string &cmd, std::string &response);
+	AXAResponseCode send_cmd_(std::string &cmd, std::string &response, int max_retries);
 	AXAResponseCode send_cmd_(std::string &cmd);
+	AXAResponseCode send_cmd_(std::string &cmd, int max_retries);
 	AXAResponseCode execute_cmd_(std::string &cmd);
 };
 
