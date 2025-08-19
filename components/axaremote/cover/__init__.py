@@ -11,11 +11,13 @@ axaremote_ns = cg.esphome_ns.namespace('axaremote')
 AXARemoteCover = axaremote_ns.class_('AXARemoteCover', cg.Component, cover.Cover, uart.UARTDevice)
 
 CONF_AUTO_CALIBRATE = "auto_calibrate"
+CONF_RETRY_INTERVAL = "retry_interval"
 
 CONFIG_SCHEMA = cover.cover_schema(AXARemoteCover).extend(
     {
         cv.GenerateID(): cv.declare_id(AXARemoteCover),
         cv.Optional(CONF_POLLING_INTERVAL, default="0s"): cv.positive_time_period_milliseconds,
+        cv.Optional(CONF_RETRY_INTERVAL, default="0s"): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_CLOSE_DURATION, default="50s"): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_AUTO_CALIBRATE, default=False): bool,
     }
@@ -29,5 +31,6 @@ async def to_code(config):
     await uart.register_uart_device(var, config)
 
     cg.add(var.set_polling_interval(config[CONF_POLLING_INTERVAL]))
+    cg.add(var.set_retry_interval(config[CONF_RETRY_INTERVAL]))
     cg.add(var.set_close_duration(config[CONF_CLOSE_DURATION]))
     cg.add(var.set_auto_calibrate(config[CONF_AUTO_CALIBRATE]))
