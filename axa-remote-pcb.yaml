@@ -40,7 +40,7 @@ ota:
 
 # This points to the public location of this yaml file.
 dashboard_import:
-  package_import_url: github://rrooggiieerr/esphome-axaremote/axa-remote-pcb.yaml@main
+  package_import_url: github://rrooggiieerr/esphome-axaremote/axa-remote.yaml
   import_full_config: false
 
 wifi:
@@ -58,8 +58,8 @@ esp32_improv:
   authorizer: flash_button
 
 # Sets up the improv via serial client for Wi-Fi provisioning
-improv_serial:
-  next_url: https://github.com/rrooggiieerr/esphome-axaremote
+# improv_serial:
+#   next_url: https://github.com/rrooggiieerr/esphome-axaremote
 
 status_led:
   pin:
@@ -91,8 +91,8 @@ sensor:
     icon: "mdi:brightness-5"
     accuracy_decimals: 1
     filters:
-    #   # 0.075 V = 0%
-    #   # 3.14853 V = 100%
+      # 0.075 V = 0%
+      # 3.14853 V = 100%
       - lambda: return ((x - 0.075) / (3.14853 - 0.075)) * 100;
 
 binary_sensor:
@@ -120,3 +120,11 @@ cover:
     uart_id: uart_axa1
     close_duration: 40s
     auto_calibrate: True
+#   - platform: axaremote
+#     name: "Window 2"
+#     id: cover_axa2
+#     device_id: axa_2
+#     device_class: window
+#     uart_id: uart_axa2
+#     close_duration: 40s
+#     auto_calibrate: True
