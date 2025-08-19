@@ -138,13 +138,13 @@ void AXARemoteCover::loop() {
 	uint32_t retry_interval = 1000;
 	if(this->polling_interval_ < retry_interval)
 		retry_interval = this->polling_interval_;
-	if(this->retry_operation_ != nullptr && millis() - this->last_cmd_ >= retry_interval) {
+	if(this->retry_operation_ != 255 && millis() - this->last_cmd_ >= retry_interval) {
 		ESP_LOGD(TAG, "Retrying operation");
-		this->start_direction_(*this->retry_operation_);
+		this->start_direction_(cover::CoverOperation(this->retry_operation_));
 	}
 
 	const uint32_t now = millis();
-	if (this->retry_operation_ == nullptr && now - this->last_cmd_ >= this->polling_interval_) {
+	if (this->retry_operation_ == 255 && now - this->last_cmd_ >= this->polling_interval_) {
 		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS);
 
 		if ((response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
@@ -309,7 +309,7 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 
 	if(response_code == AXAResponseCode::OK) {
 		this->current_operation = dir;
-		this->retry_operation_ = nullptr;
+		this->retry_operation_ = 255;
 
 		switch (dir) {
 		case cover::COVER_OPERATION_IDLE:
@@ -328,7 +328,7 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 			break;
 		}
 	} else
-		this->retry_operation_ = &dir;
+		this->retry_operation_ = dir;
 }
 
 void AXARemoteCover::recompute_position_() {

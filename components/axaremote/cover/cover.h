@@ -70,7 +70,7 @@ protected:
 	float lock_position_{0};
 	bool lock_cleared_ = false;
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
-	cover::CoverOperation *retry_operation_;
+	uint8_t retry_operation_ = 255;
 
 	void control(const cover::CoverCall &call) override;
 	bool is_at_target_() const;
