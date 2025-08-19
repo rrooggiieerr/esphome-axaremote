@@ -77,6 +77,7 @@ status_led:
   pin:
     number: GPIO2
     inverted: False
+    ignore_strapping_warning: true
 
 uart:
   - id: uart_axa1
@@ -116,6 +117,7 @@ binary_sensor:
         input: True
         pullup: True
       inverted: True
+      ignore_strapping_warning: true
     internal: True
 
 button:
