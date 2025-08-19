@@ -9,7 +9,7 @@ static const char *const TAG = "axaremote.cover";
 void AXARemoteCover::setup() {
 	ESP_LOGCONFIG(TAG, "Setting up AXA Remote cover...");
 
-w	this->send_cmd_(AXACommand::DEVICE, this->device, 2);
+	this->send_cmd_(AXACommand::DEVICE, this->device, 2);
 	this->send_cmd_(AXACommand::VERSION, this->version, 2);
 
 	if(this->device.empty() && this->version.empty()) {
