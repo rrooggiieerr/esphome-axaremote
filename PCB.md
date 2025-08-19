@@ -52,6 +52,8 @@ Remote.
 
 The ESPHome based firmware Implements the open Improv Wi-Fi standard via BLE. If you use BLE Proxies in your Home Assistant the PCB will automatically be detected.
 
+When using Improv Wi-Fi via BLE you need to press the boot button to authorize the 
+
 ## Updating the firmware
 
 The PCB comes with a version of ESPHome and the AXA Remote component installed and configured for one AXA Remote. If you want to enable the support for a second AXA Remote you need to update the firmware.
