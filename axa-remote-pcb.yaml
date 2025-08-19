@@ -6,6 +6,7 @@ substitutions:
 esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
+  comment: "AXA Remote 2.0 Window Opener"
   # Automatically add the mac address to the name
   # so a single firmware can be used for all devices
   name_add_mac_suffix: true
@@ -22,7 +23,7 @@ esphome:
 
 external_components:
   - source: github://rrooggiieerr/esphome-axaremote
-    refresh: 0s
+    components: [axaremote]
 
 esp32:
   board: esp32dev
@@ -58,8 +59,19 @@ esp32_improv:
   authorizer: flash_button
 
 # Sets up the improv via serial client for Wi-Fi provisioning
-# improv_serial:
-#   next_url: https://github.com/rrooggiieerr/esphome-axaremote
+improv_serial:
+  next_url: https://github.com/rrooggiieerr/esphome-axaremote
+
+# esp32_ble_tracker:
+#   scan_parameters:
+#     interval: 1100ms
+#     window: 1100ms
+#     active: false
+
+# bluetooth_proxy:
+#   active: true
+
+safe_mode:
 
 status_led:
   pin:
@@ -118,13 +130,13 @@ cover:
     device_id: axa_1
     device_class: window
     uart_id: uart_axa1
-    close_duration: 40s
+    # close_duration: 50s
     auto_calibrate: True
-#   - platform: axaremote
-#     name: "Window 2"
-#     id: cover_axa2
-#     device_id: axa_2
-#     device_class: window
-#     uart_id: uart_axa2
-#     close_duration: 40s
-#     auto_calibrate: True
+  - platform: axaremote
+    name: "Window 2"
+    id: cover_axa2
+    device_id: axa_2
+    device_class: window
+    uart_id: uart_axa2
+    # close_duration: 50s
+    auto_calibrate: True
