@@ -58,6 +58,7 @@ protected:
 	uint32_t polling_interval_;
 	bool auto_calibrate_ = false;
 	bool power_outage_detected_ = false;
+	bool connected_ = false;
 
 	uint32_t last_cmd_{0};
 	uint32_t last_recompute_time_{0};
