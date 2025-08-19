@@ -474,9 +474,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd) {
 	return this->send_cmd_(cmd, s);
 }
 
-AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, int max_retries) {
+AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, int max_tries) {
 	std::string s;
-	return this->send_cmd_(cmd, s, max_retries);
+	return this->send_cmd_(cmd, s, max_tries);
 }
 
 }  // namespace axaremote
