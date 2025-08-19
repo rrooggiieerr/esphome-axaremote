@@ -9,8 +9,8 @@ static const char *const TAG = "axaremote.cover";
 void AXARemoteCover::setup() {
 	ESP_LOGCONFIG(TAG, "Setting up AXA Remote cover...");
 
-	this->send_cmd_(AXACommand::DEVICE, this->device, 5);
-	this->send_cmd_(AXACommand::VERSION, this->version, 5);
+w	this->send_cmd_(AXACommand::DEVICE, this->device, 2);
+	this->send_cmd_(AXACommand::VERSION, this->version, 2);
 
 	if(this->device.empty() && this->version.empty()) {
 		this->connected_ = false;
@@ -441,16 +441,16 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	return AXAResponseCode::Invalid;
 }
 
-AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response, int max_retries) {
+AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response, int max_tries) {
 	AXAResponseCode response_code;
-	int retries = 0;
+	int tries = 0;
 
 	uint32_t retry_interval = 1000;
 	if(this->polling_interval_ < retry_interval)
 		retry_interval = this->polling_interval_;
 
 	while(true) {
-		if(retries > 0)
+		if(tries > 0)
 			ESP_LOGI(TAG, "Retrying to send command");
 
 		response_code = this->send_cmd_(cmd, response);
@@ -458,14 +458,13 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 			break;
 		response.erase();
 
-		if(retries == max_retries) {
+		tries++;
+		if(tries == max_tries) {
 			ESP_LOGE(TAG, "Failed to send command");
 			break;
 		}
-		retries++;
 		esphome::delay(retry_interval);
 	}
-	while(response_code == AXAResponseCode::Invalid && retries <= max_retries);
 
 	return response_code;
 }
