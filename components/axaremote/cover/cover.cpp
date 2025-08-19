@@ -370,13 +370,13 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	// Flush UART.
 	this->flush();
 
-	this->last_cmd_ = millis();
+	const uint32_t now = millis();
+	this->last_cmd_ = now;
 
 	// Read the response.
 	bool echo_received = false;
 	int response_code_ = 0;
 	std::string response_;
-	const uint32_t now = millis();
 	while(true) {
 		if(this->available() > 0) {
 			uint8_t c;
