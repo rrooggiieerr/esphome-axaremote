@@ -373,11 +373,15 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	// Flush UART before sending command.
 	this->flush();
 
-	// Clear the serial buffer
+	// Read and clear the serial buffer
+	std::string garbage;
 	while(this->available()) {
 		uint8_t c;
 		this->read_byte(&c);
+		garbage += c;
 	}
+	if (garbage.length() > 0)
+		ESP_LOGD(TAG, "Garbage received: %s", garbage.c_str());
 
 	// Send the command.
 	if (cmd == AXACommand::STATUS) {
