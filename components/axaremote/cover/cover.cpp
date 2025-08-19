@@ -300,6 +300,7 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 		cmd = &AXACommand::CLOSE;
 		break;
 	default:
+		ESP_LOGE(TAG, "Invalid direction: %d", dir);
 		return;
 	}
 
@@ -379,7 +380,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	}
 
 	// Send the command.
-	if (cmd != AXACommand::STATUS) {
+	if (cmd == AXACommand::STATUS) {
+		ESP_LOGV(TAG, "Command: %s", cmd.c_str());
+	} else {
 		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
 	}
 	this->write_str(cmd.c_str());
