@@ -138,13 +138,13 @@ void AXARemoteCover::loop() {
 	uint32_t retry_interval = 1000;
 	if(this->polling_interval_ < retry_interval)
 		retry_interval = this->polling_interval_;
-	if(this->retry_operation_ != COVER_OPERATION_NONE && millis() - this->last_cmd_ >= retry_interval) {
+	if(this->retry_operation_ != COVER_OPERATION_NONE && millis() - this->last_cmd_time_ >= retry_interval) {
 		ESP_LOGD(TAG, "Retrying operation");
 		this->start_direction_(cover::CoverOperation(this->retry_operation_));
 	}
 
 	const uint32_t now = millis();
-	if (this->retry_operation_ == COVER_OPERATION_NONE && now - this->last_cmd_ >= this->polling_interval_) {
+	if (this->retry_operation_ == COVER_OPERATION_NONE && now - this->last_cmd_time_ >= this->polling_interval_) {
 		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS);
 
 		if ((response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
@@ -393,7 +393,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	this->flush();
 
 	const uint32_t now = millis();
-	this->last_cmd_ = now;
+	this->last_cmd_time_ = now;
 
 	// Read the response.
 	bool echo_received = false;

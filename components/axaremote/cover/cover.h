@@ -62,7 +62,7 @@ protected:
 	bool power_outage_detected_ = false;
 	bool connected_ = false;
 
-	uint32_t last_cmd_{0};
+	uint32_t last_cmd_time_{0};
 	uint32_t last_recompute_time_{0};
 	uint32_t start_close_time_{0};
 	uint32_t last_publish_time_{0};
