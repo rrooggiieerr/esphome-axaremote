@@ -36,6 +36,8 @@ enum class AXAResponseCode {
 const float LOCK_OPEN = 1.0f;
 const float LOCK_CLOSED = 0.0f;
 
+const uint8_t COVER_OPERATION_NONE = 255;
+
 class AXARemoteCover: public Component, public cover::Cover, public uart::UARTDevice {
 public:
 	float get_setup_priority() const override { return esphome::setup_priority::DATA; }
@@ -70,7 +72,7 @@ protected:
 	float lock_position_{0};
 	bool lock_cleared_ = false;
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
-	uint8_t retry_operation_ = 255;
+	uint8_t retry_operation_ = COVER_OPERATION_NONE;
 
 	void control(const cover::CoverCall &call) override;
 	bool is_at_target_() const;
