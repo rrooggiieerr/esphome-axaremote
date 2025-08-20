@@ -31,14 +31,14 @@ void AXARemoteCover::setup() {
 		ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
 		ESP_LOGI(TAG, "Current operation: %d", this->current_operation);
 
-		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 5);
+		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 2);
 
 		if (this->position == cover::COVER_OPEN) {
 			// After a power outage the AXA Remote will only close if first the open command is
 			// given. If the window is fully open we can safely give an other open command without
 			// influencing the actual window position.
 			esphome::delay(10);
-			this->send_cmd_(AXACommand::OPEN, 5);
+			this->send_cmd_(AXACommand::OPEN, 2);
 		} else if (this->position == cover::COVER_CLOSED and response_code == AXAResponseCode::Unlocked) {
 			// After a power outage the AXA Remote always reports the lock state as unlocked even
 			// when the window is closed and locked. Only opening and then closing the window will
@@ -46,9 +46,9 @@ void AXARemoteCover::setup() {
 			ESP_LOGW(TAG, "Power outage detected");
 			this->power_outage_detected_ = true;
 //			esphome::delay(10);
-//			this->send_cmd_(AXACommand::OPEN, 5);
+//			this->send_cmd_(AXACommand::OPEN, 2;
 //			esphome::delay(10000);
-//			this->send_cmd_(AXACommand::CLOSE, 5);
+//			this->send_cmd_(AXACommand::CLOSE, 2);
 //			call = this->make_call();
 //			call.set_command_close();
 //			call.perform();
@@ -60,11 +60,11 @@ void AXARemoteCover::setup() {
 //			ESP_LOGW(TAG, "Power outage detected");
 //			this->power_outage_detected_ = true;
 //			esphome::delay(10);
-//			this->send_cmd_(AXACommand::OPEN, 5);
+//			this->send_cmd_(AXACommand::OPEN, 2);
 //			esphome::delay(2000);
-//			this->send_cmd_(AXACommand::CLOSE, 5);
+//			this->send_cmd_(AXACommand::CLOSE, 2);
 //			esphome::delay(2000);
-//			this->send_cmd_(AXACommand::STOP, 5);
+//			this->send_cmd_(AXACommand::STOP, 2);
 		}
 
 		if(this->position > 0.0f) {
@@ -73,7 +73,7 @@ void AXARemoteCover::setup() {
 		}
 	} else {
 		ESP_LOGI(TAG, "Nothing to restore");
-		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 5);
+		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 2);
 
 		if(response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) {
 			this->position = cover::COVER_CLOSED;
