@@ -9,9 +9,19 @@ static const char *const TAG = "axaremote.cover";
 void AXARemoteCover::setup() {
 	ESP_LOGCONFIG(TAG, "Setting up AXA Remote cover...");
 
-	this->send_cmd_(AXACommand::DEVICE, this->device);
+	this->send_cmd_(AXACommand::DEVICE, this->device, 2);
+	this->send_cmd_(AXACommand::VERSION, this->version, 2);
+
+	if(this->device.empty() && this->version.empty()) {
+		this->connected_ = false;
+		ESP_LOGCONFIG(TAG, "No AXA Remote connected");
+		this->set_internal(true);
+		return;
+	}
+
+	this->connected_ = true;
+
 	ESP_LOGCONFIG(TAG, "  Device: %s", this->device.c_str());
-	this->send_cmd_(AXACommand::VERSION, this->version);
 	ESP_LOGCONFIG(TAG, "  Firmware: %s", this->version.c_str());
 
 	auto restore = this->restore_state_();
@@ -21,28 +31,28 @@ void AXARemoteCover::setup() {
 		ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
 		ESP_LOGI(TAG, "Current operation: %d", this->current_operation);
 
-		AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
+		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 2);
 
 		if (this->position == cover::COVER_OPEN) {
 			// After a power outage the AXA Remote will only close if first the open command is
 			// given. If the window is fully open we can safely give an other open command without
 			// influencing the actual window position.
 			esphome::delay(10);
-			this->send_cmd_(AXACommand::OPEN);
-		} else if (this->position == cover::COVER_CLOSED and response == AXAResponseCode::Unlocked) {
+			this->send_cmd_(AXACommand::OPEN, 2);
+		} else if (this->position == cover::COVER_CLOSED and response_code == AXAResponseCode::Unlocked) {
 			// After a power outage the AXA Remote always reports the lock state as unlocked even
 			// when the window is closed and locked. Only opening and then closing the window will
 			// reset the lock state.
 			ESP_LOGW(TAG, "Power outage detected");
 			this->power_outage_detected_ = true;
 //			esphome::delay(10);
-//			this->send_cmd_(AXACommand::OPEN);
+//			this->send_cmd_(AXACommand::OPEN, 2;
 //			esphome::delay(10000);
-//			this->send_cmd_(AXACommand::CLOSE);
+//			this->send_cmd_(AXACommand::CLOSE, 2);
 //			call = this->make_call();
 //			call.set_command_close();
 //			call.perform();
-		} else if (this->position == cover::COVER_CLOSED && (response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked)) {
+		} else if (this->position == cover::COVER_CLOSED && (response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked)) {
 			// This is as expected, no power outage occurred.
 //		} else {
 //			// After a power outage the AXA Remote will only close if first the open command is
@@ -50,11 +60,11 @@ void AXARemoteCover::setup() {
 //			ESP_LOGW(TAG, "Power outage detected");
 //			this->power_outage_detected_ = true;
 //			esphome::delay(10);
-//			this->send_cmd_(AXACommand::OPEN);
+//			this->send_cmd_(AXACommand::OPEN, 2);
 //			esphome::delay(2000);
-//			this->send_cmd_(AXACommand::CLOSE);
+//			this->send_cmd_(AXACommand::CLOSE, 2);
 //			esphome::delay(2000);
-//			this->send_cmd_(AXACommand::STOP);
+//			this->send_cmd_(AXACommand::STOP, 2);
 		}
 
 		if(this->position > 0.0f) {
@@ -63,14 +73,14 @@ void AXARemoteCover::setup() {
 		}
 	} else {
 		ESP_LOGI(TAG, "Nothing to restore");
-		AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
+		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 2);
 
-		if(response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) {
+		if(response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) {
 			this->position = cover::COVER_CLOSED;
 			this->last_position_ = cover::COVER_CLOSED;
 			this->lock_position_ = LOCK_CLOSED;
 			this->lock_cleared_ = false;
-		} else if(response == AXAResponseCode::Unlocked) {
+		} else if(response_code == AXAResponseCode::Unlocked) {
 			this->position = 0.5f;
 			this->last_position_ = 0.5f;
 			this->lock_position_ = LOCK_OPEN;
@@ -81,6 +91,11 @@ void AXARemoteCover::setup() {
 }
 
 void AXARemoteCover::dump_config() {
+	if(!this->connected_) {
+		ESP_LOGCONFIG(TAG, "No AXA Remote connected");
+		return;
+	}
+
 	LOG_COVER("", "AXA Remote cover", this);
 	ESP_LOGCONFIG(TAG, "  Device: %s", this->device.c_str());
 	ESP_LOGCONFIG(TAG, "  Firmware: %s", this->version.c_str());
@@ -117,15 +132,22 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 }
 
 void AXARemoteCover::loop() {
+	if(!this->connected_)
+		return;
+
+	uint32_t retry_interval = 1000;
+	if(this->polling_interval_ < retry_interval)
+		retry_interval = this->polling_interval_;
+	if(this->retry_operation_ != COVER_OPERATION_NONE && millis() - this->last_cmd_time_ >= retry_interval) {
+		ESP_LOGD(TAG, "Retrying operation");
+		this->start_direction_(cover::CoverOperation(this->retry_operation_));
+	}
+
 	const uint32_t now = millis();
+	if (this->retry_operation_ == COVER_OPERATION_NONE && now - this->last_cmd_time_ >= this->polling_interval_) {
+		AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS);
 
-	uint32_t time_lapsed_since_last_poll = now - this->last_poll_time_;
-	if (time_lapsed_since_last_poll >= this->polling_interval_) {
-		this->last_poll_time_ = now;
-
-		AXAResponseCode response = this->send_cmd_(AXACommand::STATUS);
-
-		if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
+		if ((response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
 			// This happens when the window opener is closed with the remote.
 			ESP_LOGD(TAG, "Closed with remote?");
 
@@ -135,10 +157,10 @@ void AXARemoteCover::loop() {
 			this->lock_cleared_ = false;
 			this->current_operation = cover::COVER_OPERATION_IDLE;
 			this->publish_state();
-		} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && !this->lock_cleared_) {
+		} else if ((response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && !this->lock_cleared_) {
 			// When the window is being opened by the ESP from the closed position the first couple of
 			// status responses will still be StrongLocked/WeakLocked. Ignore and continue.
-		} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && this->lock_cleared_) {
+		} else if ((response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_OPENING && this->lock_cleared_) {
 			// This happens when the window is being opened, but then closed with the remote.
 			ESP_LOGD(TAG, "Closed with remote while opening?");
 
@@ -148,7 +170,7 @@ void AXARemoteCover::loop() {
 			this->lock_cleared_ = false;
 			this->current_operation = cover::COVER_OPERATION_IDLE;
 			this->publish_state();
-		} else if ((response == AXAResponseCode::StrongLocked || response == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_CLOSING) {
+		} else if ((response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) && this->current_operation == cover::COVER_OPERATION_CLOSING) {
 			if(this->last_position_ == cover::COVER_OPEN) {
 				// Only calculate the full close duration when the last position has been fully open.
 				uint32_t close_duration = now - this->start_close_time_;
@@ -163,7 +185,7 @@ void AXARemoteCover::loop() {
 			this->lock_cleared_ = false;
 			this->current_operation = cover::COVER_OPERATION_IDLE;
 			this->publish_state();
-		} else if (response == AXAResponseCode::Unlocked && this->position == cover::COVER_CLOSED && this->current_operation == cover::COVER_OPERATION_IDLE) {
+		} else if (response_code == AXAResponseCode::Unlocked && this->position == cover::COVER_CLOSED && this->current_operation == cover::COVER_OPERATION_IDLE) {
 			// This happens when the window opener is opened with the remote.
 			ESP_LOGD(TAG, "Opened with remote?");
 			this->position = cover::COVER_CLOSED;
@@ -172,13 +194,13 @@ void AXARemoteCover::loop() {
 			this->lock_position_ = 0.2f;
 			this->last_recompute_time_ = now;
 			this->publish_state();
-		} else if (response == AXAResponseCode::Unlocked) {
+		} else if (response_code == AXAResponseCode::Unlocked) {
 			if(!this->lock_cleared_) {
 				ESP_LOGD(TAG, "Lock cleared on lock position %.1f%%", this->lock_position_ * 100);
 			}
 			this->lock_cleared_ = true;
 		} else {
-			ESP_LOGV(TAG, "Response: %d", response);
+			ESP_LOGV(TAG, "Response code: %d", response_code);
 		}
 	}
 
@@ -186,31 +208,28 @@ void AXARemoteCover::loop() {
 		// Recompute position every loop cycle during movement.
 		this->recompute_position_();
 
-		if (this->is_at_target_()) {
+		if (this->is_at_target_() && this->last_position_ != this->position) {
 			if (this->target_position_ == cover::COVER_CLOSED) {
 				// Don't trigger stop and don't idle, let the cover stop and idle by response StrongLocked/WeakLocked.
+				this->last_position_ = cover::COVER_CLOSED;
 			} else if (this->target_position_ == cover::COVER_OPEN) {
 				// Don't trigger stop command, let the cover stop by itself.
 				this->current_operation = cover::COVER_OPERATION_IDLE;
 				this->last_position_ = cover::COVER_OPEN;
-			} else if (this->last_position_ != this->position) {
+			} else {
 				// Trigger stop command.
 				this->start_direction_(cover::COVER_OPERATION_IDLE);
 				this->last_position_ = this->position;
 			}
 			this->publish_state();
-		}
-
-		// Send current position every 1%.
-		if (now - this->last_publish_time_ > this->unlock_duration_/100) {
+		} else if (now - this->last_publish_time_ > this->open_duration_/100 && this->position > cover::COVER_CLOSED && this->position < cover::COVER_OPEN) {
+			// Send current position every 1%.
 			this->publish_state(false);
 			this->last_publish_time_ = now;
 		}
 
 		// Log current position every second.
 		if (now - this->last_log_time_ > 1000) {
-			if(this->power_outage_detected_)
-				ESP_LOGW(TAG, "Power outage detected");
 			ESP_LOGV(TAG, "Current operation: %d", this->current_operation);
 			ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
 			ESP_LOGV(TAG, "Last position: %.1f%%", this->last_position_ * 100);
@@ -263,34 +282,50 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 
 	this->recompute_position_();
 
-	this->current_operation = dir;
-
 	const uint32_t now = millis();
 	this->last_recompute_time_ = now;
 
+	std::string *cmd;
 	switch (dir) {
 	case cover::COVER_OPERATION_IDLE:
-		this->send_cmd_(AXACommand::STOP);
-		this->last_position_ = this->position;
+		cmd = &AXACommand::STOP;
 		break;
 	case cover::COVER_OPERATION_OPENING:
-		this->last_operation_ = dir;
-		if(this->position > cover::COVER_CLOSED)
-			this->last_position_ = this->position;
-		this->send_cmd_(AXACommand::OPEN);
+		cmd = &AXACommand::OPEN;
 		break;
 	case cover::COVER_OPERATION_CLOSING:
-		this->last_operation_ = dir;
-		if(this->position < cover::COVER_OPEN)
-			this->last_position_ = this->position;
-		// After a power reset an open window will only close if first the open command is given
-		// this->send_cmd_(AXACommand::OPEN);
-		this->start_close_time_ = now;
-		this->send_cmd_(AXACommand::CLOSE);
+		cmd = &AXACommand::CLOSE;
 		break;
 	default:
+		ESP_LOGE(TAG, "Invalid direction: %d", dir);
 		return;
 	}
+
+	AXAResponseCode response_code;
+	response_code = this->send_cmd_(*cmd);
+
+	if(response_code == AXAResponseCode::OK) {
+		this->current_operation = dir;
+		this->retry_operation_ = COVER_OPERATION_NONE;
+
+		switch (dir) {
+		case cover::COVER_OPERATION_IDLE:
+			this->last_position_ = this->position;
+			break;
+		case cover::COVER_OPERATION_OPENING:
+			this->last_operation_ = dir;
+			if(this->position > cover::COVER_CLOSED)
+				this->last_position_ = this->position;
+			break;
+		case cover::COVER_OPERATION_CLOSING:
+			this->last_operation_ = dir;
+			if(this->position < cover::COVER_OPEN)
+				this->last_position_ = this->position;
+			this->start_close_time_ = now;
+			break;
+		}
+	} else
+		this->retry_operation_ = dir;
 }
 
 void AXARemoteCover::recompute_position_() {
@@ -332,86 +367,117 @@ bool AXARemoteCover::is_at_target_() const {
 }
 
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response) {
-	int retries = 0;
-	while (true) {
-		// Flush UART before sending command.
-		this->flush();
+	// Flush UART before sending command.
+	this->flush();
 
-		// Clear the serial buffer
-		while(this->available()) {
+	// Read and clear the serial buffer
+	std::string garbage;
+	while(this->available()) {
+		uint8_t c;
+		this->read_byte(&c);
+		garbage += c;
+	}
+	if (garbage.length() > 0)
+		ESP_LOGD(TAG, "Garbage received: %s", garbage.c_str());
+
+	// Send the command.
+	if (cmd == AXACommand::STATUS) {
+		ESP_LOGV(TAG, "Command: %s", cmd.c_str());
+	} else {
+		ESP_LOGD(TAG, "Command: %s", cmd.c_str());
+	}
+	this->write_str(cmd.c_str());
+	this->write_str("\r\n");
+
+	// Flush UART.
+	this->flush();
+
+	const uint32_t now = millis();
+	this->last_cmd_time_ = now;
+
+	// Read the response.
+	bool echo_received = false;
+	int response_code_ = 0;
+	std::string response_;
+	while(true) {
+		if(this->available() > 0) {
 			uint8_t c;
 			this->read_byte(&c);
-		}
+			if (response_.length() == 0 && c >= '0' && c <= '9')
+				response_code_ = (response_code_ * 10) + (c - '0');
+			else if (c == ' ' && response_.length() == 0) {
+				// Do nothing.
+			} else if (c != '\r' && c != '\n')
+				response_ += c;
+			if (c == '\n' || !this->available()) {
+				if (response_ == cmd) {
+					// Command echo.
+					if (cmd != AXACommand::STATUS)
+						ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
+					echo_received = true;
+				} else if (response_.length() > 0) {
+					if (!echo_received && cmd != AXACommand::STATUS)
+						ESP_LOGW(TAG, "No command echo received");
 
-		// Send the command.
-		if (cmd != AXACommand::STATUS) {
-			ESP_LOGD(TAG, "Command: %s", cmd.c_str());
-		}
-		this->write_str(cmd.c_str());
-		this->write_str("\r\n");
-
-		// Flush UART.
-		this->flush();
-
-		// Read the response.
-		bool echo_received = false;
-		int response_code_ = 0;
-		std::string response_;
-		const uint32_t now = millis();
-		while(true) {
-			if(this->available() > 0) {
-				uint8_t c;
-				this->read_byte(&c);
-				if (response_.length() == 0 && c >= '0' && c <= '9')
-					response_code_ = (response_code_ * 10) + (c - '0');
-				else if (c == ' ' && response_.length() == 0) {
-					// Do nothing.
-				} else if (c != '\r' && c != '\n')
-					response_ += c;
-				if (c == '\n' || !this->available()) {
-					if (response_ == cmd) {
-						// Command echo.
+					if (response_code_ >= int(AXAResponseCode::OK) && response_code_ <= int(AXAResponseCode::Error)) {
+						// The actual response.
 						if (cmd != AXACommand::STATUS)
-							ESP_LOGD(TAG, "Command echo received: %s", response_.c_str());
-						echo_received = true;
-					} else if (response_.length() > 0) {
-						if (!echo_received && cmd != AXACommand::STATUS)
-							ESP_LOGW(TAG, "No command echo received");
-
-						if (response_code_ >= int(AXAResponseCode::OK) && response_code_ <= int(AXAResponseCode::Error)) {
-							// The actual response.
-							if (cmd != AXACommand::STATUS)
-								ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
-							response += response_;
-							return AXAResponseCode(response_code_);
-						} else {
-							// Garbage.
-							ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
-						}
+							ESP_LOGD(TAG, "Response: %d %s", response_code_, response_.c_str());
+						response += response_;
+						return AXAResponseCode(response_code_);
+					} else {
+						// Garbage.
+						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
 					}
-					response_.erase();
 				}
-			}
-			if (millis() - now > 25) {
-				ESP_LOGE(TAG, "Timeout while waiting for response");
-				break;
+				response_.erase();
 			}
 		}
-
-		if (retries == 5) {
+		if (millis() - now > 25) {
 			ESP_LOGE(TAG, "Timeout while waiting for response");
 			break;
 		}
-		retries++;
-		esphome::delay(10);
 	}
 
 	return AXAResponseCode::Invalid;
 }
 
+AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &response, int max_tries) {
+	AXAResponseCode response_code;
+	int tries = 0;
+
+	uint32_t retry_interval = 1000;
+	if(this->polling_interval_ < retry_interval)
+		retry_interval = this->polling_interval_;
+
+	while(true) {
+		if(tries > 0)
+			ESP_LOGI(TAG, "Retrying to send command");
+
+		response_code = this->send_cmd_(cmd, response);
+		if(response_code != AXAResponseCode::Invalid && response_code != AXAResponseCode::Error)
+			break;
+		response.erase();
+
+		tries++;
+		if(tries == max_tries) {
+			ESP_LOGE(TAG, "Failed to send command");
+			break;
+		}
+		esphome::delay(retry_interval);
+	}
+
+	return response_code;
+}
+
 AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd) {
 	std::string s;
 	return this->send_cmd_(cmd, s);
+}
+
+AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, int max_tries) {
+	std::string s;
+	return this->send_cmd_(cmd, s, max_tries);
 }
 
 }  // namespace axaremote

@@ -36,6 +36,8 @@ enum class AXAResponseCode {
 const float LOCK_OPEN = 1.0f;
 const float LOCK_CLOSED = 0.0f;
 
+const uint8_t COVER_OPERATION_NONE = 255;
+
 class AXARemoteCover: public Component, public cover::Cover, public uart::UARTDevice {
 public:
 	float get_setup_priority() const override { return esphome::setup_priority::DATA; }
@@ -58,8 +60,9 @@ protected:
 	uint32_t polling_interval_;
 	bool auto_calibrate_ = false;
 	bool power_outage_detected_ = false;
+	bool connected_ = false;
 
-	uint32_t last_poll_time_{0};
+	uint32_t last_cmd_time_{0};
 	uint32_t last_recompute_time_{0};
 	uint32_t start_close_time_{0};
 	uint32_t last_publish_time_{0};
@@ -69,6 +72,7 @@ protected:
 	float lock_position_{0};
 	bool lock_cleared_ = false;
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
+	uint8_t retry_operation_ = COVER_OPERATION_NONE;
 
 	void control(const cover::CoverCall &call) override;
 	bool is_at_target_() const;
@@ -78,7 +82,9 @@ protected:
 	void recompute_position_();
 
 	AXAResponseCode send_cmd_(std::string &cmd, std::string &response);
+	AXAResponseCode send_cmd_(std::string &cmd, std::string &response, int max_retries);
 	AXAResponseCode send_cmd_(std::string &cmd);
+	AXAResponseCode send_cmd_(std::string &cmd, int max_retries);
 };
 
 }  // namespace axaremote
