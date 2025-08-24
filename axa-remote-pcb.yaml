@@ -107,6 +107,7 @@ sensor:
       # 0.075 V = 0%
       # 3.14853 V = 100%
       - lambda: return ((x - 0.075) / (3.14853 - 0.075)) * 100;
+    disabled_by_default: True
 
 binary_sensor:
   - platform: gpio
