@@ -21,6 +21,7 @@ PCB in the battery compartment:
 <img src="PCB in battery compartment.png"/>
 
 ### Features
+
 - Fits in the AXA Remote battery compartment  
   Two slits in the PCB allow you to slide the PCB over the battery deviders in the battery
   compartment.
@@ -38,6 +39,16 @@ PCB in the battery compartment:
   Implements a captive portal and the open [Improv Wi-Fi](https://www.improv-wifi.com/) standard
   via BLE to easily setup your local Wi-Fi network credentials.
 
+## What's included
+
+- PCB
+- 40 cm RJ25 (6P6C) to JST connector cable
+  To connect the AXA Remote to the PCB.
+- RJ25 (6P6C) connector and 3 pin female JST connector + contacts
+  To make your own fire for connection a second AXA Remote.
+- Light-Dependent Resistor (LDR)
+  To measure brightness.
+
 ## Installation
 
 To fit the PCB in the battery compartment of the AXA Remote two minor modifications are needed.
@@ -45,12 +56,23 @@ To fit the PCB in the battery compartment of the AXA Remote two minor modificati
 First the battery clip needs to be removed, you can easily slide this out battery compartment.
 
 Then a small notch needs to be cut out the battery compartment to guide the wire out of the battery
-compartment towards the cable duct that guides the cale to the RJ25 (6P6C) connector of the AXA
+compartment towards the cable duct that guides the cable to the RJ25 (6P6C) connector of the AXA
 Remote.
+
+Connect the RJ25 (6P6C) side of the provided cable to the AXA Remote and guide the wire trough the
+cable duct. Then connect the JST connector to J2/AXA 1 on the PCB.
+
+J3/AXA 2 can be used to connect a second AXA Remote. By default the power of the primary AXA Remote
+is forwarded to the secondary, but if this secondary AXA Remote has it's own powersupply you can
+cut JP3 and JP3 to diable the power forwarding.
+
+### Connecting the Light-Dependent Resistor (LDR)
+
+You can solder the provided LDR on solderpads R9/Brightness of the PCB. The LDR does not have a polarity, orientation does mot matter. You can drill a 5 mm hole in the casing of the AXA Remote and let the LDR peek trough.
 
 ## Connecting the PCB to your Wi-Fi network and Home Assistant
 
-The ESPHome based firmware Implements the open Improv Wi-Fi standard via BLE. If you use BLE Proxies in your Home Assistant the PCB will automatically be detected.
+The ESPHome based firmware implements the open Improv Wi-Fi standard via BLE. If you use BLE Proxies in your Home Assistant the PCB will automatically be detected and an authentication workflow.
 
 When using Improv Wi-Fi via BLE you need to press the boot button to authorize the 
 
@@ -63,6 +85,10 @@ The PCB comes with a version of ESPHome and the AXA Remote component installed a
 ```
 ToDo
 ```
+
+## Factory reseting the firmware
+
+ToDo
 
 ## Star this external component
 
