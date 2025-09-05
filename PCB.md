@@ -45,7 +45,7 @@ PCB in the battery compartment:
 - 40 cm RJ25 (6P6C) to JST connector cable
   To connect the AXA Remote to the PCB.
 - RJ25 (6P6C) connector and 3 pin female JST connector + contacts
-  To make your own fire for connection a second AXA Remote.
+  To make your own wire for connection a second AXA Remote.
 - Light-Dependent Resistor (LDR)
   To measure brightness.
 
