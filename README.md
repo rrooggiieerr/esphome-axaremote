@@ -221,14 +221,18 @@ __auto_calibrate__ which will automatically update the unlock, open, close and l
 time the window is closed from fully open to fully closed and locked.
 
 
-## Star this external component
+## Contribution and appreciation
+
+You can contribute to this component, or show your appreciation, in the following ways.
+
+### Star this external component
 
 Help other ESPHome and AXA Remote users find this external component by starring this GitHub page.
 Click **⭐ Star** on the top right of the GitHub page.
 
-## Support my work
+### Support my work
 
-Do you enjoy using this ESPHome component? Then consider supporting my work using one of the
+Do you enjoy using this ESPHome component? Please consider supporting my work through one of the
 following platforms, your donation is greatly appreciated and keeps me motivated:
 
 [![GitHub Sponsors][github-shield]][github]
@@ -236,10 +240,24 @@ following platforms, your donation is greatly appreciated and keeps me motivated
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 [![Patreon][patreon-shield]][patreon]
 
-## Hire me
+### ESPHome support
 
-If you're in need for a freelance ESP developer for your project please contact me, you can find my
-email address on [my GitHub profile](https://github.com/rrooggiieerr).
+[Book a one-hour ESPHome support session](https://buymeacoffee.com/rrooggiieerr/e/470127). I’ll
+help you troubleshoot your ESPHome setup or answer your ESPHome-related questions.
+
+What can be done in one hour:
+- ESPHome walktrough, I explain to you how ESPHome works
+- Assistance setting up your ESP device
+- Install and configure an ESPHome (External) Component
+
+What takes more time:
+- Support for ESPHome Component developers
+
+### Hire me
+
+If you would like to have an ESPHome component developed for your product or are in need for a
+freelance ESP developer for your project please contact me, you can find my email address on
+[my GitHub profile](https://github.com/rrooggiieerr).
 
 [releases]: https://github.com/rrooggiieerr/esphome-axaremote/releases
 [releases-shield]: https://img.shields.io/github/v/release/rrooggiieerr/esphome-axaremote?style=for-the-badge
