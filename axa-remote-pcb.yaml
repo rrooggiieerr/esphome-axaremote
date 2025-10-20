@@ -38,6 +38,7 @@ api:
 
 ota:
   - platform: esphome
+    id: ota_esphome
 
 # This points to the public location of this yaml file.
 dashboard_import:
