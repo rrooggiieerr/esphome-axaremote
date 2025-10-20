@@ -65,11 +65,14 @@ improv_serial:
 
 safe_mode:
 
-status_led:
-  pin:
-    number: GPIO2
-    inverted: False
-    ignore_strapping_warning: True
+light:
+  - platform: status_led
+    id: _status_led
+    pin:
+      number: GPIO2
+      inverted: False
+      ignore_strapping_warning: True
+    internal: True
 
 uart:
   - id: uart_axa1
