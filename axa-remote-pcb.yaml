@@ -63,15 +63,6 @@ esp32_improv:
 improv_serial:
   next_url: https://github.com/rrooggiieerr/esphome-axaremote
 
-# esp32_ble_tracker:
-#   scan_parameters:
-#     interval: 1100ms
-#     window: 1100ms
-#     active: False
-
-# bluetooth_proxy:
-#   active: True
-
 safe_mode:
 
 status_led:
