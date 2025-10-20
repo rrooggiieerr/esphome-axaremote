@@ -115,11 +115,30 @@ binary_sensor:
       inverted: True
       ignore_strapping_warning: True
     internal: True
+    filters:
+      - delayed_on: 50ms 
+    on_multi_click:
+      - timing:
+          - ON for 0.2s to 3s
+          - OFF for 0.1s to 2s
+          - ON for 0.2s to 3s
+          - OFF for 0.1s to 2s
+          - ON for at least 5s 
+        then:
+          - repeat: 
+              count: 5
+              then:
+                - light.turn_on: _status_led
+                - delay: 150ms
+                - light.turn_off: _status_led
+                - delay: 150ms
+          - light.turn_on: _status_led
+          - button.press: factory_reset_button
 
 button:
   - platform: factory_reset
-    name: Restart with Factory Default Settings
-    disabled_by_default: True
+    id: factory_reset_button
+    internal: True
 
 cover:
   - platform: axaremote
