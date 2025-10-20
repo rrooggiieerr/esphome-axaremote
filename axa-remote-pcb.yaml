@@ -9,7 +9,7 @@ esphome:
   comment: "AXA Remote 2.0 Window Opener"
   # Automatically add the mac address to the name
   # so a single firmware can be used for all devices
-  name_add_mac_suffix: true
+  name_add_mac_suffix: True
   project:
     name: "rrooggiieerr.axaremote"
     version: "0.1.0"
@@ -42,7 +42,7 @@ ota:
 # This points to the public location of this yaml file.
 dashboard_import:
   package_import_url: github://rrooggiieerr/esphome-axaremote/axa-remote-pcb.yaml
-  import_full_config: false
+  import_full_config: False
 
 wifi:
   # Set up a wifi access point
@@ -66,10 +66,10 @@ improv_serial:
 #   scan_parameters:
 #     interval: 1100ms
 #     window: 1100ms
-#     active: false
+#     active: False
 
 # bluetooth_proxy:
-#   active: true
+#   active: True
 
 safe_mode:
 
@@ -77,7 +77,7 @@ status_led:
   pin:
     number: GPIO2
     inverted: False
-    ignore_strapping_warning: true
+    ignore_strapping_warning: True
 
 uart:
   - id: uart_axa1
@@ -118,7 +118,7 @@ binary_sensor:
         input: True
         pullup: True
       inverted: True
-      ignore_strapping_warning: true
+      ignore_strapping_warning: True
     internal: True
 
 button:
