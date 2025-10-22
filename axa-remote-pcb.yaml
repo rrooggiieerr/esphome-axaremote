@@ -14,10 +14,8 @@ esphome:
     name: "rrooggiieerr.axaremote"
     version: "0.1.0"
 
-  # Define devices
+  # Define sub-devices
   devices:
-    - id: axa_1
-      name: "AXA 1"
     - id: axa_2
       name: "AXA 2"
 
@@ -89,7 +87,6 @@ uart:
 sensor:
   - platform: adc
     id: brightness
-    device_id: axa_1
     name: "Brightness"
     pin: GPIO33
     device_class: illuminance
@@ -144,7 +141,6 @@ cover:
   - platform: axaremote
     name: "Window 1"
     id: cover_axa1
-    device_id: axa_1
     device_class: window
     uart_id: uart_axa1
     # close_duration: 50s
