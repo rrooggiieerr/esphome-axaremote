@@ -113,7 +113,7 @@ ToDo
 
 ### ESPHome example configuration
 
-```
+```yaml
 substitutions:
   name: "axa-remote-4131b0"
   friendly_name: AXA Remote 4131b0
@@ -132,6 +132,25 @@ wifi:
   password: !secret wifi_password
 ```
 
+### Setting the close duration
+
+By default the firmware is configured to auto calibrate the unlock, open, close and lock durations
+every time the window is closed from fully open to fully closed and locked. If you prefer to set a
+fixed time for your window you can override this configuration. To do this open the window fully
+and the close the window. The component will measure the time it takes until the lock is in one of
+the locked states. By default the close duration is logged as info message to the ESPHome logging
+console. You can then use this value to set the __close_duration__ of your ESPHome configuration.
+
+```yaml
+cover:
+  - id: !extend cover_axa1
+    auto_calibrate: False
+    close_duration: 35s
+  - id: !extend cover_axa2
+    auto_calibrate: False
+    close_duration: 35s
+```
+
 ### Adding BLE Tracker and Bluetooth Proxy
 
 The ESP32 used on the PCB has Bluetooth capabilities and can thus be used as a BLE Tracker or
@@ -139,13 +158,13 @@ Bluetooth Proxy.
 
 To enable the BLE Tracker component add the following line to the ESPHome configuration file.
 
-```
+```yaml
 esp32_ble_tracker:
 ```
 
 To enable the Bluetooth Proxy component add the following line to the ESPHome configuration file.
 
-```
+```yaml
 bluetooth_proxy:
 ```
 
