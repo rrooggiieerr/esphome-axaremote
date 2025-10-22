@@ -374,7 +374,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	while(this->available()) {
 		uint8_t c;
 		this->read_byte(&c);
-		garbage += c;
+		if (c != '\r') {
+			garbage += c;
+		}
 	}
 	if (garbage.length() > 0)
 		ESP_LOGD(TAG, "Garbage received: %s", garbage.c_str());
