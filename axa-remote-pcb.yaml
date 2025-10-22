@@ -17,7 +17,7 @@ esphome:
   # Define sub-devices
   devices:
     - id: axa_2
-      name: "AXA 2"
+      name: "${friendly_name} 2"
 
 external_components:
   - source: github://rrooggiieerr/esphome-axaremote@0.1.0
