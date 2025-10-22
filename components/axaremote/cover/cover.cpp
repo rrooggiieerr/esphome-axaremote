@@ -410,7 +410,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 				// Do nothing.
 			} else if (c != '\r' && c != '\n')
 				response_ += c;
-			if (c == '\n' || !this->available()) {
+			if (c == '\n') {
 				if (response_ == cmd) {
 					// Command echo.
 					if (cmd != AXACommand::STATUS)
@@ -434,7 +434,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 				response_.erase();
 			}
 		}
-		if (millis() - now > 25) {
+		if (millis() - now > 100) {
 			ESP_LOGE(TAG, "Timeout while waiting for response");
 			break;
 		}
