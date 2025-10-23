@@ -1,6 +1,6 @@
 # These substitutions allow the end user to override certain values
 substitutions:
-  name: "axa-remote"
+  name: "axa-remote-pcb"
   friendly_name: "AXA Remote"
 
 esphome:
@@ -44,7 +44,7 @@ ota:
 update:
   - platform: http_request
     name: Firmware Update
-    source: http://rrooggiieerr.github.io/esphome-axaremote/manifest.json
+    source: http://rrooggiieerr.github.io/esphome-axaremote/firmware/axa-remote-pcb.manifest.json
 
 # This points to the public location of this yaml file.
 dashboard_import:
