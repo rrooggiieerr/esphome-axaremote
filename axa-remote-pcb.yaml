@@ -44,7 +44,7 @@ ota:
 update:
   - platform: http_request
     name: Firmware Update
-    source: http://rrooggiieerr.github.io/esphome-axaremote/firmware/axa-remote-pcb.manifest.json
+    source: https://rrooggiieerr.github.io/esphome-axaremote/firmware/axa-remote-pcb.manifest.json
 
 # This points to the public location of this yaml file.
 dashboard_import:
