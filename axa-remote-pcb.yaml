@@ -62,15 +62,6 @@ improv_serial:
 
 safe_mode:
 
-light:
-  - platform: status_led
-    id: _status_led
-    pin:
-      number: GPIO2
-      inverted: False
-      ignore_strapping_warning: True
-    internal: True
-
 uart:
   - id: uart_axa1
     tx_pin: GPIO17
@@ -82,6 +73,15 @@ uart:
     rx_pin: GPIO22
     baud_rate: 19200
     stop_bits: 2
+
+light:
+  - platform: status_led
+    id: _status_led
+    pin:
+      number: GPIO2
+      inverted: False
+      ignore_strapping_warning: True
+    internal: True
 
 sensor:
   - platform: adc
