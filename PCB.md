@@ -91,9 +91,9 @@ When using Improv Wi-Fi via BLE you need to press the boot button to authorize t
 
 <img src="Improv via BLE authorisation.png" width="50%"/>
 
-If you don't have Bluetooth configured you can connect to the built in access pont named
-_axa-remote-000000_ with password _axaremote_ and configure the Wi-Fi using the supplied web
-interface on [http://192.168.4.1/](http://192.168.4.1/).
+If you don't have Bluetooth configured you can connect to the built in fallback hotspot named
+_axa-remote-000000_ and configure the Wi-Fi using the supplied web interface on
+[http://192.168.4.1/](http://192.168.4.1/).
 
 ### Home Assistant configuration
 
