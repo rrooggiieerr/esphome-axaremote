@@ -46,7 +46,6 @@ dashboard_import:
 wifi:
   # Set up a wifi access point
   ap:
-    password: "axaremote"
 
 # In combination with the `ap` this allows the user
 # to provision wifi credentials to the device.
