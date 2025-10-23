@@ -12,7 +12,7 @@ esphome:
   name_add_mac_suffix: True
   project:
     name: "rrooggiieerr.axaremote"
-    version: "0.1.0"
+    version: "0.1.1"
 
   # Define sub-devices
   devices:
@@ -20,7 +20,7 @@ esphome:
       name: "${friendly_name} 2"
 
 external_components:
-  - source: github://rrooggiieerr/esphome-axaremote@0.1.0
+  - source: github://rrooggiieerr/esphome-axaremote@0.1.1
     components: [axaremote]
 
 esp32:
