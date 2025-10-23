@@ -10,7 +10,7 @@
 
 ## Introduction
 
-I designed a PCB that fits in the battery compartment of the AXA Remote and can controll up to two
+I designed a PCB that fits in the battery compartment of the AXA Remote and can control up to two
 window openers. Only minor modifications to the battery compartment are needed. Contact me if you
 like to buy one! You can find my email address on [my GitHub profile](https://github.com/rrooggiieerr).
 
@@ -21,7 +21,7 @@ like to buy one! You can find my email address on [my GitHub profile](https://gi
 - Fits in the AXA Remote battery compartment  
   Two slits in the PCB allow you to slide the PCB over the battery deviders in the battery
   compartment.
-- Controll up to two AXA Remote window openers  
+- Control up to two AXA Remote window openers  
   Two LIN convertors allow you to connect to two different AXA Remote window openers.
 - Powered from the AXA Remote power supply  
   A buit in power regulator brings the 7.5 Volt power of the AXA Remote to the 3.3 Volt that the
@@ -211,11 +211,13 @@ following platforms, your donation is greatly appreciated and keeps me motivated
 help you troubleshoot your ESPHome setup or answer your ESPHome-related questions.
 
 What can be done in one hour:
+
 - ESPHome walktrough, I explain to you how ESPHome works
 - Assistance setting up your ESP device
 - Install and configure an ESPHome (External) Component
 
 What takes more time:
+
 - Support for ESPHome Component developers
 
 ### Hire me

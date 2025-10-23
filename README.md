@@ -12,14 +12,15 @@
 
 The AXA Remote is a [rigid chain actuator](https://en.wikipedia.org/wiki/Rigid_chain_actuator)
 driven electronic window opener that is mounted in the window frame. It comes with an infrared
-remote controll but can also be controlled using serial commands.
+remote control but can also be controlled using serial commands.
 
-<img src="AXA Remote.jpg"/>
+![AXA Remote](AXA Remote.jpg)
 
 This [ESPHome External Component](https://esphome.io/components/external_components) lets you
 control an AXA Remote window opener using these serial commands.
 
 The component features:
+
 - Open/Stop/Close the window
 - Move window to a given position
 - Calibrate the open/close timings
@@ -92,10 +93,10 @@ from the AXA Remote input voltage. Your mileage may vary and do this at your own
 
 ### PCB
 
-A custom PCB is developed that fits in the battery compartment of the AXA Remote and can controll
+A custom PCB is developed that fits in the battery compartment of the AXA Remote and can control
 up to two window openers. Only minor modifications to the battery compartment are needed.
 
-<img src="PCB in battery compartment.png"/>
+![PCB in battery compartment](PCB in battery compartment.png)
 
 The PCB is powered from the AXA Remote power supply and uses an ESP32 which is pre-loaded with the
 required ESPHome firmware. The firmware supports the open [Improv Wi-Fi](https://www.improv-wifi.com/)
@@ -251,11 +252,13 @@ following platforms, your donation is greatly appreciated and keeps me motivated
 help you troubleshoot your ESPHome setup or answer your ESPHome-related questions.
 
 What can be done in one hour:
+
 - ESPHome walktrough, I explain to you how ESPHome works
 - Assistance setting up your ESP device
 - Install and configure an ESPHome (External) Component
 
 What takes more time:
+
 - Support for ESPHome Component developers
 
 ### Hire me
