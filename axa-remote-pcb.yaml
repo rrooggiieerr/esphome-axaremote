@@ -38,6 +38,11 @@ ota:
   - platform: esphome
     id: ota_esphome
 
+update:
+  - platform: http_request
+    name: Firmware Update
+    source: http://rrooggiieerr.github.io/esphome-axaremote/manifest.json
+
 # This points to the public location of this yaml file.
 dashboard_import:
   package_import_url: github://rrooggiieerr/esphome-axaremote/axa-remote-pcb.yaml
