@@ -246,7 +246,7 @@ following platforms, your donation is greatly appreciated and keeps me motivated
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 [![Patreon][patreon-shield]][patreon]
 
-### ESPHome support
+### ESPHome support session
 
 [Book a one-hour ESPHome support session](https://buymeacoffee.com/rrooggiieerr/e/470127). I’ll
 help you troubleshoot your ESPHome setup or answer your ESPHome-related questions.
@@ -254,7 +254,7 @@ help you troubleshoot your ESPHome setup or answer your ESPHome-related question
 What can be done in one hour:
 
 - ESPHome walktrough, I explain to you how ESPHome works
-- Assistance setting up your ESP device
+- Assistance in setting up your ESP device
 - Install and configure an ESPHome (External) Component
 
 What takes more time:
