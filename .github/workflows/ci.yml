@@ -22,7 +22,7 @@ jobs:
       matrix:
         #### Modify below here to match your project ####
         file:
-          - axa-remote-pcb.yaml
+          - axa-remote-pcb
         #### Modify above here to match your project ####
 
         esphome-version:
