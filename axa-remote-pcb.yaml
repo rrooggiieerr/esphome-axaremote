@@ -8,11 +8,8 @@ esphome:
   friendly_name: "${friendly_name}"
   comment: "AXA Remote 2.0 Window Opener"
   # Automatically add the mac address to the name
-  # so a single firmware can be used for all devices
-  name_add_mac_suffix: True
-  project:
-    name: "rrooggiieerr.axaremote"
-    version: "0.1.1"
+  # so you can use a single firmware for all devices
+  name_add_mac_suffix: true
 
   # Define sub-devices
   devices:
@@ -20,7 +17,7 @@ esphome:
       name: "${friendly_name} 2"
 
 external_components:
-  - source: github://rrooggiieerr/esphome-axaremote@0.1.1
+  - source: github://rrooggiieerr/esphome-axaremote@latest
     components: [axaremote]
 
 esp32:
@@ -34,41 +31,18 @@ logger:
 # Enable Home Assistant API
 api:
 
-http_request:
-
+# OTA is required for Over-the-Air updating
 ota:
   - platform: esphome
     id: ota_esphome
-  - platform: http_request
-
-update:
-  - platform: http_request
-    name: Firmware Update
-    source: https://rrooggiieerr.github.io/esphome-axaremote/firmware/axa-remote-pcb.manifest.json
-
-# This points to the public location of this yaml file.
-dashboard_import:
-  package_import_url: github://rrooggiieerr/esphome-axaremote/axa-remote-pcb.yaml
-  import_full_config: False
 
 wifi:
-  # Set up a wifi access point
+  # Set up a wifi access point using the device name above
   ap:
 
 # In combination with the `ap` this allows the user
 # to provision wifi credentials to the device.
 captive_portal:
-
-# Set up Bluetooth LE to allow the user
-# to provision wifi credentials to the device.
-esp32_improv:
-  authorizer: boot_button
-
-# Sets up the improv via serial client for Wi-Fi provisioning
-improv_serial:
-  next_url: https://github.com/rrooggiieerr/esphome-axaremote
-
-safe_mode:
 
 uart:
   - id: uart_axa1
