@@ -14,7 +14,7 @@ The AXA Remote is a [rigid chain actuator](https://en.wikipedia.org/wiki/Rigid_c
 driven electronic window opener that is mounted in the window frame. It comes with an infrared
 remote control but can also be controlled using serial commands.
 
-![AXA Remote](AXA Remote.jpg)
+![AXA Remote](AXA%20Remote.jpg)
 
 This [ESPHome External Component](https://esphome.io/components/external_components) lets you
 control an AXA Remote window opener using these serial commands.
@@ -96,7 +96,7 @@ from the AXA Remote input voltage. Your mileage may vary and do this at your own
 A custom PCB is developed that fits in the battery compartment of the AXA Remote and can control
 up to two window openers. Only minor modifications to the battery compartment are needed.
 
-![PCB in battery compartment](PCB in battery compartment.png)
+![PCB in battery compartment](PCB%20in%20battery%20compartment.png)
 
 The PCB is powered from the AXA Remote power supply and uses an ESP32 which is pre-loaded with the
 required ESPHome firmware. The firmware supports the open [Improv Wi-Fi](https://www.improv-wifi.com/)
