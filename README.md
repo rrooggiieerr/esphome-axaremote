@@ -16,15 +16,15 @@ remote control but can also be controlled using serial commands.
 
 ![AXA Remote](AXA%20Remote.jpg)
 
-This [ESPHome External Component](https://esphome.io/components/external_components) lets you
-control an AXA Remote window opener using these serial commands.
+This [ESPHome External Component](https://esphome.io/components/external_components) uses these
+serial commands to control the AXA Remote window opener.
 
 The component features:
 
 - Open/Stop/Close the window
 - Move window to a given position
 - Calibrate the open/close timings
-- Use remote control simultaneously
+- Use remote control simultaneously[*](#using-the-remote-control)
 
 ## AXA Remote models
 
@@ -113,7 +113,8 @@ This are the protocol details:
 Serial port settings: 19200 baud 8N2  
 
 Device command: `DEVICE`, returns the device type, `AXA RV2900 2.0` on my AXA Remote 2.0 device.  
-Version command: `VERSION`, returns the firmware version of the AXA Remote, `Firmware V1.20 2012` on my AXA Remote 2.0 device.  
+Version command: `VERSION`, returns the firmware version of the AXA Remote, `Firmware V1.20 2012`
+on my AXA Remote 2.0 device.  
 Status command: `STATUS`, returns the current lock state.  
 Open command: `OPEN`, opens the window opener.  
 Stop command: `STOP`, stops the window opener.  
@@ -127,6 +128,10 @@ Each command is ended with a carriage return and newline `\r\n`.
 - Unlocked
 - Strong Locked
 - Weak Locked
+
+I don't know what makes the difference between Strong Locked and Weak Locked. During the
+development of this component I somewhat randomly got these different states back from the `STATUS`
+command.
 
 ## Using the remote control
 
