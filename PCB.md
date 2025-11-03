@@ -16,6 +16,8 @@ like to buy one! You can find my email address on [my GitHub profile](https://gi
 
 <img src="PCB.png"/>
 
+This PCB or the ESPHome External Component is in no way affiliated with the AXA Home Security brand.
+
 ### Features
 
 - Fits in the AXA Remote battery compartment  
@@ -27,7 +29,7 @@ like to buy one! You can find my email address on [my GitHub profile](https://gi
   A buit in power regulator brings the 7.5 Volt power of the AXA Remote to the 3.3 Volt that the
   ESP32 needs.
 - Power pass trough to second window opener  
-  The connector for connecting to a second window opener als delivers power, no need for a second
+  The connector for connecting to a second window opener also delivers power, no need for a second
   power supply.
 - Light sensor  
   A provided photoresistor can be soldered in place to make the firmware report light intensity.
@@ -41,9 +43,16 @@ like to buy one! You can find my email address on [my GitHub profile](https://gi
 - 40 cm RJ25 (6P6C) to JST XH connector cable  
   To connect the AXA Remote to the PCB.
 - RJ25 (6P6C) connector and 3 pin female JST XH connector + contacts  
-  To make your own wire for connection a second AXA Remote.
+  To make your own wire for connecting a second AXA Remote.
 - Light-Dependent Resistor (LDR)  
   To measure brightness.
+
+You need to create the second cable yourself with the provided RJ25 and JST XH connectors and
+your own cable. You can just use a 4 wire phone cable and only use 3 of those wires for Vin,
+Ground ad Data.
+
+Because you need to drill a hole in the AXA Remote housing and not everyone might want to do
+that, you need to solder on the LDR yourself. The rest of the PCB is fully assembled.
 
 ## Installation
 
