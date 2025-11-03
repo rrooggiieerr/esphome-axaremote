@@ -60,25 +60,32 @@ Then a small notch needs to be cut out the battery compartment to guide the wire
 duct that brings the cable to the RJ25 (6P6C) connector of the AXA Remote.
 
 Connect the RJ25 (6P6C) side of the provided cable to the _AXA Remote_ and guide the wire trough the
-cable duct. Then connect the JST XH connector to _J2/AXA 1_ on the PCB.
+cable duct. Then connect the JST XH connector to __J2/AXA 1__ on the PCB.
 
-_J3/AXA 2_ can be used to connect a second AXA Remote. By default the power of the primary AXA Remote
+__J3/AXA 2__ can be used to connect a second AXA Remote. By default the power of the primary AXA Remote
 is forwarded to the secondary, but if this secondary AXA Remote has it's own power supply you can
-cut JP3 and JP3 to disable the power forwarding.
+cut __JP3__ and __JP3__ to disable the power forwarding.
+
+The firmware will detect if a second AXA Remote is connected and create a cover entity accordingly.
 
 ### Connecting the Light-Dependent Resistor (LDR)
 
-Optionally you can solder the provided LDR on solderpads _R9/Brightness_ of the PCB. The LDR does
+Optionally you can solder the provided LDR on solderpads __R9/Brightness__ of the PCB. The LDR does
 not have a polarity, orientation does mot matter. You can drill a 5 mm hole in the casing of the
 AXA Remote and let the LDR peek trough.
 
 The light sensor is disabled in Home Assistant. Click the disabled entity and enable the sensor if
 you want to use the sensor.
 
+### Disabling the power LED
+
+You can disable the Power LED by cutting the trace between jumper __JP1__ with a sharp knife. If
+you want to enable the LED again on a later moment soldering __JP1__ will bring the LED back.
+
 ### Wi-Fi configuration
 
 The ESPHome based firmware implements the open _Improv via BLE_ standard for configuring Wi-Fi. If
-your Home Assistant has Bluetooth configured, or you're using [Bluetooth Proxies](https://esphome.io/components/bluetooth_proxy/),
+your Home Assistant has Bluetooth configured, or you're using _[Bluetooth Proxies](https://esphome.io/components/bluetooth_proxy/)_,
 the AXA Remote PCB will be automatically discovered by the Improv integration. 
 
 <img src="PCB discovered by Improv via BLE.png" width="50%"/>
@@ -87,7 +94,8 @@ You can then continue the _Improv via BLE_ config flow to setup the Wi-Fi connec
 
 <img src="Improv via BLE confirm set up.png" width="50%"/> <img src="Improv via BLE Wi-Fi credentials.png" width="50%"/>
 
-When using Improv Wi-Fi via BLE you need to press the boot button to authorize the authentication.
+When using Improv Wi-Fi via BLE you need to press the __Boot__ button on the PCB to authorize the
+authentication.
 
 <img src="Improv via BLE authorisation.png" width="50%"/>
 
@@ -105,20 +113,18 @@ ESPHome configuration flow to add the PCB to your Home Assistant.
 
 ## Updating the firmware
 
-The PCB comes with a version of ESPHome and the AXA Remote component installed and configured for
-one AXA Remote. If you want to enable the support for a second AXA Remote you need to update the
-firmware.
+The _ESPHome Device Builder_ software will automatically discover the firmware on the PCB and
+suggest to take controll over the device. After taking controll over the device you are able to
+modify and run your own ESPHome firmware on the PCB.
 
-ToDo
-
-### ESPHome example configuration
+_ESPHome example configuration after taking controll_
 
 ```yaml
 substitutions:
-  name: "axa-remote-4131b0"
+  name: axa-remote-pcb-4131b0
   friendly_name: AXA Remote 4131b0
 packages:
-  rrooggiieerr.axaremote: github://rrooggiieerr/esphome-axaremote/axa-remote-pcb.yaml
+  rrooggiieerr.axaremote: github://rrooggiieerr/esphome-axaremote/axa-remote-pcb.yaml@main
 esphome:
   name: ${name}
   name_add_mac_suffix: false
@@ -132,6 +138,8 @@ wifi:
   password: !secret wifi_password
 ```
 
+After updating the firmware with your own version automatic firmware updates will no longer work!
+
 ### Setting the close duration
 
 By default the firmware is configured to auto calibrate the unlock, open, close and lock durations
@@ -139,7 +147,7 @@ every time the window is closed from fully open to fully closed and locked. If y
 fixed time for your window you can override this configuration. To do this open the window fully
 and the close the window. The component will measure the time it takes until the lock is in one of
 the locked states. By default the close duration is logged as info message to the ESPHome logging
-console. You can then use this value to set the __close_duration__ of your ESPHome configuration.
+console. You can then use this value to set the `close_duration` of your ESPHome configuration.
 
 ```yaml
 cover:
@@ -170,13 +178,14 @@ bluetooth_proxy:
 
 ### GPIO
 
-ToDo
+Version 0.4 of the PCB has GPIO4, GPIO5, GPIO18, GPIO19 and GPIO21 exposed. You can use these GPIO to
+your own liking for aditional sensors.
 
 ## Factory reseting the firmware
 
 A factory reset erases the settings stored in the ESP32.
 
-To reset press the Boot button in the following sequence:
+To reset press the __Boot__ button in the following sequence:
 
 On for 2 second  
 Off for 1 second  
