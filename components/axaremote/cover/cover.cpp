@@ -379,7 +379,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 		}
 	}
 	if (garbage.length() > 0)
-		ESP_LOGD(TAG, "Garbage received: %s", garbage.c_str());
+		ESP_LOGD(TAG, "Garbage received: %d", garbage.size());
 
 	// Send the command.
 	if (cmd == AXACommand::STATUS) {
@@ -428,7 +428,7 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 						return AXAResponseCode(response_code_);
 					} else {
 						// Garbage.
-						ESP_LOGW(TAG, "Garbage received: %s", response_.c_str());
+						ESP_LOGW(TAG, "Garbage received: %d", response_.size());
 					}
 				}
 				response_.erase();
