@@ -118,7 +118,7 @@ binary_sensor:
     id: binary_sensor_axa1
     device_class: window
     lambda: |-
-      id(binary_sensor_axa1).set_internal(id(cover_axa2).is_internal());
+      id(binary_sensor_axa1).set_internal(id(cover_axa1).is_internal());
       return id(cover_axa1).position > COVER_CLOSED;
   - platform: template
     name: "Window 2"
