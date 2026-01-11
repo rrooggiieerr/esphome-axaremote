@@ -113,6 +113,21 @@ binary_sensor:
                 - delay: 150ms
           - light.turn_on: _status_led
           - button.press: factory_reset_button
+  - platform: template
+    name: "Window 1"
+    id: binary_sensor_axa1
+    device_class: window
+    lambda: |-
+      id(binary_sensor_axa1).set_internal(id(cover_axa2).is_internal());
+      return id(cover_axa1).position > COVER_CLOSED;
+  - platform: template
+    name: "Window 2"
+    id: binary_sensor_axa2
+    device_class: window
+    device_id: axa_2
+    lambda: |-
+      id(binary_sensor_axa2).set_internal(id(cover_axa2).is_internal());
+      return id(cover_axa2).position > COVER_CLOSED;
 
 button:
   - platform: factory_reset
