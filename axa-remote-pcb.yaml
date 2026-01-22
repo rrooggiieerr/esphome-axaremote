@@ -148,5 +148,6 @@ cover:
     device_id: axa_2
     device_class: window
     uart_id: uart_axa2
+    detect: True
     # close_duration: 50s
     auto_calibrate: True

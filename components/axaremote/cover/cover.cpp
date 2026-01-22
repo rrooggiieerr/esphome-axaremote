@@ -10,19 +10,22 @@ void AXARemoteCover::setup() {
 	ESP_LOGCONFIG(TAG, "Setting up AXA Remote cover...");
 
 	this->send_cmd_(AXACommand::DEVICE, this->device, 2);
+	if(!this->device.empty())
+		ESP_LOGCONFIG(TAG, "  Device: %s", this->device.c_str());
 	this->send_cmd_(AXACommand::VERSION, this->version, 2);
+	if(!this->version.empty())
+		ESP_LOGCONFIG(TAG, "  Firmware: %s", this->version.c_str());
 
 	if(this->device.empty() && this->version.empty()) {
-		this->connected_ = false;
 		ESP_LOGCONFIG(TAG, "No AXA Remote connected");
-		this->set_internal(true);
-		return;
+		if(this->detect_) {
+			this->connected_ = false;
+			this->set_internal(true);
+			return;
+		}
 	}
 
 	this->connected_ = true;
-
-	ESP_LOGCONFIG(TAG, "  Device: %s", this->device.c_str());
-	ESP_LOGCONFIG(TAG, "  Firmware: %s", this->version.c_str());
 
 	auto restore = this->restore_state_();
 	if (restore.has_value()) {

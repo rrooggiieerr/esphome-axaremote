@@ -44,6 +44,7 @@ public:
 	void setup() override;
 	void dump_config() override;
 	cover::CoverTraits get_traits() override;
+	void set_detect(bool detect) { this->detect_ = detect; }
 	void set_polling_interval(uint32_t polling_interval) { this->polling_interval_ = polling_interval; }
 	void set_close_duration(uint32_t close_duration);
 	void set_auto_calibrate(bool auto_calibrate) { this->auto_calibrate_ = auto_calibrate; }
@@ -53,6 +54,7 @@ protected:
 	std::string device;
 	std::string version;
 
+	bool detect_ = false;
 	float unlock_duration_;
 	float open_duration_;
 	float close_duration_;
