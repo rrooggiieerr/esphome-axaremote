@@ -56,61 +56,9 @@ that, you need to solder on the LDR yourself. The rest of the PCB is fully assem
 
 ## Installation
 
-### Hardware
+### [Hardware Installation](Hardware Installation.md)
 
-To fit the PCB in the battery compartment of the AXA Remote two minor modifications are needed.
-
-<img src="PCB in battery compartment.png"/>
-
-First the battery spring needs to be removed, you can easily slide this out of the battery
-compartment.
-
-Then a small notch needs to be cut out the battery compartment to guide the wire towards the cable
-duct that brings the cable to the RJ25 (6P6C) connector of the AXA Remote.
-
-Connect the RJ25 (6P6C) side of the provided cable to the _AXA Remote_ and guide the wire through the
-cable duct. Then connect the JST XH connector to __J2/AXA 1__ on the PCB.
-
-__J3/AXA 2__ can be used to connect a second AXA Remote. By default the power of the primary AXA Remote
-is forwarded to the secondary, but if this secondary AXA Remote has it's own power supply you can
-cut __JP3__ and __JP3__ to disable the power forwarding.
-
-The firmware will detect if a second AXA Remote is connected and create a cover entity accordingly.
-
-### Connecting the Light-Dependent Resistor (LDR)
-
-Optionally you can solder the provided LDR on solderpads __R9/Brightness__ of the PCB. The LDR does
-not have a polarity, orientation does not matter. You can drill a 5 mm hole in the casing of the
-AXA Remote and let the LDR peek through.
-
-The light sensor is disabled in Home Assistant. Click the disabled entity and enable the sensor if
-you want to use the sensor.
-
-### Disabling the power LED
-
-You can disable the Power LED by cutting the trace between jumper __JP1__ with a sharp knife. If
-you want to enable the LED again on a later moment soldering __JP1__ will bring the LED back.
-
-### Wi-Fi configuration
-
-The ESPHome based firmware implements the open _Improv via BLE_ standard for configuring Wi-Fi. If
-your Home Assistant has Bluetooth configured, or you're using _[Bluetooth Proxies](https://esphome.io/components/bluetooth_proxy/)_,
-the AXA Remote PCB will be automatically discovered by the Improv integration. 
-
-<img src="PCB discovered by Improv via BLE.png" width="50%"/>
-
-You can then continue the _Improv via BLE_ config flow to setup the Wi-Fi connection for the ESP32.
-
-<img src="Improv via BLE confirm set up.png" width="50%"/> <img src="Improv via BLE Wi-Fi credentials.png" width="50%"/>
-
-When using Improv Wi-Fi via BLE you need to press the __Boot__ button on the PCB to authorize the
-authentication.
-
-<img src="Improv via BLE authorisation.png" width="50%"/>
-
-If you don't have Bluetooth configured you can connect to the built in fallback hotspot named
-_axa-remote-000000_ and configure the Wi-Fi using the supplied web interface on
-[http://192.168.4.1/](http://192.168.4.1/).
+### [Wi-Fi Configuration](WiFi Configuration.md)
 
 ### Home Assistant configuration
 
@@ -119,6 +67,10 @@ AXA Remote PCB if the PCB is on the same network as your Home Assistant. You can
 ESPHome configuration flow to add the PCB to your Home Assistant.
 
 <img src="PCB discovered by ESPHome.png" width="50%"/>
+
+### Other Home Automation systems
+
+ToDo figure put how to configure in other home automation systems. MQTT?
 
 ## Updating the firmware
 
@@ -185,24 +137,9 @@ To enable the Bluetooth Proxy component add the following line to the ESPHome co
 bluetooth_proxy:
 ```
 
-### GPIO
+### [GPIO](GPIO.md)
 
-Version 0.4 of the PCB has GPIO4, GPIO5, GPIO18, GPIO19 and GPIO21 exposed. You can use these GPIO to
-your own liking for additional sensors.
-
-## Factory resetting the firmware
-
-A factory reset erases the settings stored in the ESP32.
-
-To reset press the __Boot__ button in the following sequence:
-
-On for 2 second  
-Off for 1 second  
-On for 2 second  
-Off for 1 second  
-On for 5 seconds  
-
-If successful the Status LED will flash five times.
+### [Factory Reset](Factory Reset.md)
 
 ## Contribution and appreciation
 
