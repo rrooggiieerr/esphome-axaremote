@@ -96,7 +96,7 @@ from the AXA Remote input voltage. Your mileage may vary and do this at your own
 A custom PCB is developed that fits in the battery compartment of the AXA Remote and can control
 up to two window openers. Only minor modifications to the battery compartment are needed.
 
-![PCB in battery compartment](PCB%20in%20battery%20compartment.png)
+![PCB in battery compartment](PCB/PCB%20in%20battery%20compartment.png)
 
 The PCB is powered from the AXA Remote power supply and uses an ESP32 which is pre-loaded with the
 required ESPHome firmware. The firmware supports the open [Improv Wi-Fi](https://www.improv-wifi.com/)
@@ -104,7 +104,7 @@ standard via BLE and a captive portal to easily setup your local Wi-Fi network c
 
 Additionally a Light-Dependent Resistor (LDR) can be installed to add a light sensor to the board.
 
-[Read more about the PCB](PCB.md)
+[Read more about the PCB](PCB/README.md)
 
 ## Protocol
 
