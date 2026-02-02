@@ -210,31 +210,27 @@ void AXARemoteCover::loop() {
 		// Recompute position every loop cycle during movement.
 		this->recompute_position_();
 
-		if (this->is_at_target_()) {
+		if (this->is_at_target_() && this->last_position_ != this->position) {
 			if (this->target_position_ == cover::COVER_CLOSED) {
 				// Don't trigger stop and don't idle, let the cover stop and idle by response StrongLocked/WeakLocked.
 			} else if (this->target_position_ == cover::COVER_OPEN) {
 				// Don't trigger stop command, let the cover stop by itself.
 				this->current_operation = cover::COVER_OPERATION_IDLE;
 				this->last_position_ = cover::COVER_OPEN;
-			} else if (this->last_position_ != this->position) {
+			} else {
 				// Trigger stop command.
 				this->start_direction_(cover::COVER_OPERATION_IDLE);
 				this->last_position_ = this->position;
 			}
 			this->publish_state();
-		}
-
-		// Send current position every 1%.
-		if (now - this->last_publish_time_ > this->unlock_duration_/100) {
+		} else if (now - this->last_publish_time_ > this->open_duration_/100 && this->position > cover::COVER_CLOSED && this->position < cover::COVER_OPEN) {
+			// Send current position every 1%.
 			this->publish_state(false);
 			this->last_publish_time_ = now;
 		}
 
 		// Log current position every second.
 		if (now - this->last_log_time_ > 1000) {
-			if(this->power_outage_detected_)
-				ESP_LOGW(TAG, "Power outage detected");
 			ESP_LOGV(TAG, "Current operation: %d", this->current_operation);
 			ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
 			ESP_LOGV(TAG, "Last position: %.1f%%", this->last_position_ * 100);
