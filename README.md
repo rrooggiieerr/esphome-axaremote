@@ -31,7 +31,7 @@ The component features:
 ### AXA Remote RV2900
 
 The original AXA Remote what was introduced in 2008 (or earlier?). It has a plastic frame and casing.
-It is unknow if it can be controlled by wire. If you have more information on this device let me
+It is unknown if it can be controlled by wire. If you have more information on this device let me
 know!
 
 ### AXA Remote 2.0
@@ -56,7 +56,7 @@ these messages.
 - External power supply
 
 The AXA Remote component depends on the ESPHome UART component. The ESP8266 has a software emulated
-UART which has shown to be quite flaky. It is recomended to use a micro controller with a hardware
+UART which has shown to be quite flaky. It is recommended to use a micro controller with a hardware
 UART, like the ESP32, for increased accuracy. 
 
 ### Wiring

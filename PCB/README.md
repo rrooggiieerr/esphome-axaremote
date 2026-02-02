@@ -21,14 +21,14 @@ This PCB or the ESPHome External Component is in no way affiliated with the AXA 
 ### Features
 
 - Fits in the AXA Remote battery compartment  
-  Two slits in the PCB allow you to slide the PCB over the battery deviders in the battery
+  Two slits in the PCB allow you to slide the PCB over the battery dividers in the battery
   compartment.
 - Control up to two AXA Remote window openers  
-  Two LIN convertors allow you to connect to two different AXA Remote window openers.
+  Two LIN converters allow you to connect to two different AXA Remote window openers.
 - Powered from the AXA Remote power supply  
-  A buit in power regulator brings the 7.5 Volt power of the AXA Remote to the 3.3 Volt that the
+  A built in power regulator brings the 7.5 Volt power of the AXA Remote to the 3.3 Volt that the
   ESP32 needs.
-- Power pass trough to second window opener  
+- Power pass through to second window opener  
   The connector for connecting to a second window opener also delivers power, no need for a second
   power supply.
 - Light sensor  
@@ -68,7 +68,7 @@ compartment.
 Then a small notch needs to be cut out the battery compartment to guide the wire towards the cable
 duct that brings the cable to the RJ25 (6P6C) connector of the AXA Remote.
 
-Connect the RJ25 (6P6C) side of the provided cable to the _AXA Remote_ and guide the wire trough the
+Connect the RJ25 (6P6C) side of the provided cable to the _AXA Remote_ and guide the wire through the
 cable duct. Then connect the JST XH connector to __J2/AXA 1__ on the PCB.
 
 __J3/AXA 2__ can be used to connect a second AXA Remote. By default the power of the primary AXA Remote
@@ -80,8 +80,8 @@ The firmware will detect if a second AXA Remote is connected and create a cover 
 ### Connecting the Light-Dependent Resistor (LDR)
 
 Optionally you can solder the provided LDR on solderpads __R9/Brightness__ of the PCB. The LDR does
-not have a polarity, orientation does mot matter. You can drill a 5 mm hole in the casing of the
-AXA Remote and let the LDR peek trough.
+not have a polarity, orientation does not matter. You can drill a 5 mm hole in the casing of the
+AXA Remote and let the LDR peek through.
 
 The light sensor is disabled in Home Assistant. Click the disabled entity and enable the sensor if
 you want to use the sensor.
@@ -123,7 +123,7 @@ ESPHome configuration flow to add the PCB to your Home Assistant.
 ## Updating the firmware
 
 The _ESPHome Device Builder_ software will automatically discover the firmware on the PCB and
-suggest to take controll over the device. After taking controll over the device you are able to
+suggest to take control over the device. After taking control over the device you are able to
 modify and run your own ESPHome firmware on the PCB.
 
 _ESPHome example configuration after taking controll_
@@ -188,9 +188,9 @@ bluetooth_proxy:
 ### GPIO
 
 Version 0.4 of the PCB has GPIO4, GPIO5, GPIO18, GPIO19 and GPIO21 exposed. You can use these GPIO to
-your own liking for aditional sensors.
+your own liking for additional sensors.
 
-## Factory reseting the firmware
+## Factory resetting the firmware
 
 A factory reset erases the settings stored in the ESP32.
 
@@ -202,7 +202,7 @@ On for 2 second
 Off for 1 second  
 On for 5 seconds  
 
-If successfull the Status LED will flash five times.
+If successful the Status LED will flash five times.
 
 ## Contribution and appreciation
 
