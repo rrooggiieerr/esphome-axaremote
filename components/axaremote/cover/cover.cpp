@@ -198,7 +198,7 @@ void AXARemoteCover::loop() {
 			this->publish_state();
 		} else if (response_code == AXAResponseCode::Unlocked) {
 			if(!this->lock_cleared_) {
-				ESP_LOGD(TAG, "Lock cleared on lock position %.1f%%", this->lock_position_ * 100);
+				ESP_LOGD(TAG, "Lock cleared on position %.1f%%", this->lock_position_ * 100);
 			}
 			this->lock_cleared_ = true;
 		} else {
