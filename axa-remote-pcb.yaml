@@ -17,7 +17,7 @@ esphome:
       name: "${friendly_name} 2"
 
 external_components:
-  - source: github://rrooggiieerr/esphome-axaremote@0.1.3
+  - source: github://rrooggiieerr/esphome-axaremote@0.1.4
     components: [axaremote]
     refresh: never
 
@@ -148,6 +148,6 @@ cover:
     device_id: axa_2
     device_class: window
     uart_id: uart_axa2
-    # detect: True
+    detect: True
     # close_duration: 50s
     auto_calibrate: True
