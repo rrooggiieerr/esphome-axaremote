@@ -35,4 +35,4 @@ update:
   - platform: http_request
     name: None
     id: update_http_request
-    source: https://github.com/rrooggiieerr/esphome-axaremote/releases/latest/download/axa-remote-pcb.manifest.json
+    source: https://rrooggiieerr.github.io/esphome-axaremote/firmware/axa-remote-pcb.manifest.json
