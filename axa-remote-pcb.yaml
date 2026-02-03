@@ -17,7 +17,7 @@ esphome:
       name: "${friendly_name} 2"
 
 external_components:
-  - source: github://rrooggiieerr/esphome-axaremote@0.1.4
+  - source: github://rrooggiieerr/esphome-axaremote@0.1.5
     components: [axaremote]
     refresh: never
 
