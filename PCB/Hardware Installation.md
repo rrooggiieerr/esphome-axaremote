@@ -38,6 +38,8 @@ you want to use the sensor.
 
 ## Disabling the power LED
 
-You can disable the Power LED by cutting the trace between jumper __JP1__ with a sharp knife. If
-you want to enable the LED again on a later moment soldering __JP1__ will bring the LED back.
+For PCBS of version 0.4 and earlier you can disable the Power LED by cutting the trace between
+jumper __JP1__ with a sharp knife. If you want to enable the LED again on a later moment soldering
+__JP1__ will bring the LED back.
 
+For PCBs version 0.5 you can cut the trace between R1 and D3.
