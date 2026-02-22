@@ -56,9 +56,9 @@ that, you need to solder on the LDR yourself. The rest of the PCB is fully assem
 
 ## Installation
 
-### [Hardware Installation](Hardware Installation.md)
+### [Hardware Installation](Hardware%20Installation.md)
 
-### [Wi-Fi Configuration](WiFi Configuration.md)
+### [Wi-Fi Configuration](WiFi%20Configuration.md)
 
 ### Home Assistant configuration
 
@@ -139,7 +139,7 @@ bluetooth_proxy:
 
 ### [GPIO](GPIO.md)
 
-### [Factory Reset](Factory Reset.md)
+### [Factory Reset](Factory%20Reset.md)
 
 ## Contribution and appreciation
 
