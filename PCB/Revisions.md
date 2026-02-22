@@ -30,7 +30,7 @@ The GPIO exposed are GPIO4, GPIO5, GPIO18, GPIO19 and GPIO21.
 
 This version has the board redesigned to make space for a prototype board and 8 GPIO exposed.
 
-The left side of the prototype board has 4 3.3 Volt pads on the left side and 4 Ground pads on the right side. At the bottom the GPIOs GPIO12, GPIO13, GPIO14, GPIO15, GPIO25, GPIO26, GPIO27 and GPIO32 are exposed and the inner 3 x 8 pads are not connected and available for your own components.
+The left side of the prototype board has 4 3.3 Volt pads and 4 Ground pads on the right side. At the bottom the GPIOs GPIO12, GPIO13, GPIO14, GPIO15, GPIO25, GPIO26, GPIO27 and GPIO32 are exposed and the inner 3 x 8 pads are not connected and available for your own components.
 
 ![PCB v0.5](PCB%20v0.5.jpg)
 
