@@ -2,7 +2,7 @@
 
 To fit the PCB in the battery compartment of the AXA Remote two minor modifications are needed.
 
-<img src="PCB in battery compartment.png"/>
+![PCB in battery compartment](PCB%20in%20battery%20compartment.png)
 
 First the battery spring needs to be removed, you can easily slide this out of the battery
 compartment.

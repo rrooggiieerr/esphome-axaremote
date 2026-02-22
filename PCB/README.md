@@ -14,7 +14,7 @@ I designed a PCB that fits in the battery compartment of the AXA Remote and can 
 window openers. Only minor modifications to the battery compartment are needed. Contact me if you
 like to buy one! You can find my email address on [my GitHub profile](https://github.com/rrooggiieerr).
 
-<img src="PCB.png"/>
+![PCB](PCB.png)
 
 This PCB or the ESPHome External Component is in no way affiliated with the AXA Home Security brand.
 
