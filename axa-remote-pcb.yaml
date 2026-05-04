@@ -114,14 +114,14 @@ binary_sensor:
           - light.turn_on: _status_led
           - button.press: factory_reset_button
   - platform: template
-    name: "Window 1"
+    name: None
     id: binary_sensor_axa1
     device_class: window
     lambda: |-
       id(binary_sensor_axa1).set_internal(id(cover_axa1).is_internal());
       return id(cover_axa1).position > COVER_CLOSED;
   - platform: template
-    name: "Window 2"
+    name: None
     id: binary_sensor_axa2
     device_class: window
     device_id: axa_2
@@ -136,14 +136,14 @@ button:
 
 cover:
   - platform: axaremote
-    name: "Window 1"
+    name: None
     id: cover_axa1
     device_class: window
     uart_id: uart_axa1
     # close_duration: 50s
     auto_calibrate: True
   - platform: axaremote
-    name: "Window 2"
+    name: None
     id: cover_axa2
     device_id: axa_2
     device_class: window
