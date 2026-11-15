@@ -13,12 +13,19 @@ AXARemoteCover = axaremote_ns.class_('AXARemoteCover', cg.Component, cover.Cover
 CONF_DETECT = "detect"
 CONF_AUTO_CALIBRATE = "auto_calibrate"
 
+# Keep in sync with MIN_CLOSE_DURATION and MAX_CLOSE_DURATION in cover.h
+MIN_CLOSE_DURATION = cv.TimePeriod(seconds=30)
+MAX_CLOSE_DURATION = cv.TimePeriod(seconds=60)
+
 CONFIG_SCHEMA = cover.cover_schema(AXARemoteCover).extend(
     {
         cv.GenerateID(): cv.declare_id(AXARemoteCover),
         cv.Optional(CONF_DETECT, default=False): bool,
         cv.Optional(CONF_POLLING_INTERVAL, default="0s"): cv.positive_time_period_milliseconds,
-        cv.Optional(CONF_CLOSE_DURATION, default="50s"): cv.positive_time_period_milliseconds,
+        cv.Optional(CONF_CLOSE_DURATION, default="50s"): cv.All(
+            cv.positive_time_period_milliseconds,
+            cv.Range(min=MIN_CLOSE_DURATION, max=MAX_CLOSE_DURATION),
+        ),
         cv.Optional(CONF_AUTO_CALIBRATE, default=False): bool,
     }
 ).extend(uart.UART_DEVICE_SCHEMA)

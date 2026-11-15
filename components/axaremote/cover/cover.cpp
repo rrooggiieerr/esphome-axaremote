@@ -123,7 +123,12 @@ cover::CoverTraits AXARemoteCover::get_traits() {
 	return traits;
 }
 
-void AXARemoteCover::set_close_duration(uint32_t close_duration) {
+bool AXARemoteCover::set_close_duration(uint32_t close_duration) {
+	if (close_duration < MIN_CLOSE_DURATION || close_duration > MAX_CLOSE_DURATION) {
+		ESP_LOGW(TAG, "Close duration %.1fs out of range, ignoring", close_duration / 1e3f);
+		return false;
+	}
+
 	this->full_close_duration_ = close_duration;
 	this->unlock_duration_ = close_duration * 0.55f;
 	this->open_duration_ = close_duration  * 0.7f;
@@ -134,6 +139,8 @@ void AXARemoteCover::set_close_duration(uint32_t close_duration) {
 	ESP_LOGD(TAG, "  Open Duration: %.1fs", this->open_duration_ / 1e3f);
 	ESP_LOGD(TAG, "  Close Duration: %.1fs", this->close_duration_ / 1e3f);
 	ESP_LOGD(TAG, "  Lock Duration: %.1fs", this->lock_duration_ / 1e3f);
+
+	return true;
 }
 
 void AXARemoteCover::loop() {

@@ -38,6 +38,10 @@ const float LOCK_CLOSED = 0.0f;
 
 const uint8_t COVER_OPERATION_NONE = 255;
 
+// Bounds for the close duration, from YAML, flash or measured. Keep in sync with __init__.py.
+const uint32_t MIN_CLOSE_DURATION = 30000;  // 30 s
+const uint32_t MAX_CLOSE_DURATION = 60000;  // 1 min
+
 class AXARemoteCover: public Component, public cover::Cover, public uart::UARTDevice {
 public:
 	float get_setup_priority() const override { return esphome::setup_priority::DATA; }
@@ -46,7 +50,7 @@ public:
 	cover::CoverTraits get_traits() override;
 	void set_detect(bool detect) { this->detect_ = detect; }
 	void set_polling_interval(uint32_t polling_interval) { this->polling_interval_ = polling_interval; }
-	void set_close_duration(uint32_t close_duration);
+	bool set_close_duration(uint32_t close_duration);
 	void set_auto_calibrate(bool auto_calibrate) { this->auto_calibrate_ = auto_calibrate; }
 	void loop();
 
