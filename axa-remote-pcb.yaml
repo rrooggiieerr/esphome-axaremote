@@ -11,6 +11,14 @@ esphome:
   # so you can use a single firmware for all devices
   name_add_mac_suffix: true
 
+  # Hide the window sensor when its window opener was not detected.
+  on_boot:
+    priority: 200
+    then:
+      - lambda: |-
+          id(binary_sensor_axa1).set_internal(id(cover_axa1).is_internal());
+          id(binary_sensor_axa2).set_internal(id(cover_axa2).is_internal());
+
   # Define sub-devices
   devices:
     - id: axa_2
@@ -119,7 +127,6 @@ binary_sensor:
     id: binary_sensor_axa1
     device_class: window
     lambda: |-
-      id(binary_sensor_axa1).set_internal(id(cover_axa1).is_internal());
       return id(cover_axa1).position > COVER_CLOSED;
   - platform: template
     name: None
@@ -127,7 +134,6 @@ binary_sensor:
     device_class: window
     device_id: axa_2
     lambda: |-
-      id(binary_sensor_axa2).set_internal(id(cover_axa2).is_internal());
       return id(cover_axa2).position > COVER_CLOSED;
 
 button:
