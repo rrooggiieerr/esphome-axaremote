@@ -17,7 +17,7 @@ dashboard_import:
 
 # Set up Bluetooth LE to allow the user
 # to provision wifi credentials to the device.
-esp32_improv:
+improv_ble:
   authorizer: boot_button
 
 # Sets up the improv via serial client for Wi-Fi provisioning.
