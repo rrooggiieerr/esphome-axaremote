@@ -15,6 +15,7 @@ esphome:
   devices:
     - id: axa_2
       name: "${friendly_name} 2"
+      relation: via
 
 external_components:
   - source: github://rrooggiieerr/esphome-axaremote@0.1.5
