@@ -1,6 +1,8 @@
 #pragma once
 
 #include "esphome/core/component.h"
+#include "esphome/core/preferences.h"
+#include "esphome/core/version.h"
 //#include "esphome/core/helpers.h"
 #include "esphome/components/cover/cover.h"
 #include "esphome/components/uart/uart.h"
@@ -38,6 +40,12 @@ const float LOCK_CLOSED = 0.0f;
 
 const uint8_t COVER_OPERATION_NONE = 255;
 
+// Settings stored in flash. Bump SETTINGS_PREF_VERSION whenever the layout of this struct changes.
+struct AXARemoteSettings {
+	uint32_t close_duration;  // Full close duration in ms, 0 if not calibrated
+};
+// XORed into the entity preference key; must differ from the cover's own restore state (version 0).
+const uint32_t SETTINGS_PREF_VERSION = 0x41584130;  // "AXA0"
 // Bounds for the close duration, from YAML, flash or measured. Keep in sync with __init__.py.
 const uint32_t MIN_CLOSE_DURATION = 30000;  // 30 s
 const uint32_t MAX_CLOSE_DURATION = 60000;  // 1 min
@@ -80,6 +88,11 @@ protected:
 	bool lock_cleared_ = false;
 	cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
 	uint8_t retry_operation_ = COVER_OPERATION_NONE;
+
+	AXARemoteSettings settings_{};
+	ESPPreferenceObject settings_pref_;
+
+	void save_settings_();
 
 	void control(const cover::CoverCall &call) override;
 	bool is_at_target_() const;

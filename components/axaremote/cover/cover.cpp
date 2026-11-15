@@ -27,6 +27,21 @@ void AXARemoteCover::setup() {
 
 	this->connected_ = true;
 
+	// Restore the settings from flash.
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 7, 0)
+	this->settings_pref_ = this->make_entity_preference<AXARemoteSettings>(SETTINGS_PREF_VERSION, true);
+#else
+	this->settings_pref_ = global_preferences->make_preference<AXARemoteSettings>(this->get_preference_hash() ^ SETTINGS_PREF_VERSION, true);
+#endif
+	AXARemoteSettings settings{};
+	if (this->settings_pref_.load(&settings)) {
+		this->settings_ = settings;
+
+		// Only use the calibrated close duration when auto calibration is enabled.
+		if (this->auto_calibrate_ && this->settings_.close_duration != 0 && this->set_close_duration(this->settings_.close_duration))
+			ESP_LOGI(TAG, "Restored close duration: %.1fs", this->settings_.close_duration / 1e3f);
+	}
+
 	auto restore = this->restore_state_();
 	if (restore.has_value()) {
 		ESP_LOGI(TAG, "Restoring state");
@@ -123,6 +138,14 @@ cover::CoverTraits AXARemoteCover::get_traits() {
 	return traits;
 }
 
+void AXARemoteCover::save_settings_() {
+	if (this->settings_pref_.save(&this->settings_)) {
+		ESP_LOGD(TAG, "Stored settings");
+	} else {
+		ESP_LOGW(TAG, "Failed to store settings");
+	}
+}
+
 bool AXARemoteCover::set_close_duration(uint32_t close_duration) {
 	if (close_duration < MIN_CLOSE_DURATION || close_duration > MAX_CLOSE_DURATION) {
 		ESP_LOGW(TAG, "Close duration %.1fs out of range, ignoring", close_duration / 1e3f);
@@ -186,8 +209,10 @@ void AXARemoteCover::loop() {
 				// Only calculate the full close duration when the last position has been fully open.
 				uint32_t close_duration = now - this->start_close_time_;
 				ESP_LOGI(TAG, "Full Close Duration: %.1fs", close_duration / 1e3f);
-				if (this->auto_calibrate_)
-					this->set_close_duration(close_duration);
+				if (this->auto_calibrate_ && this->set_close_duration(close_duration)) {
+					this->settings_.close_duration = close_duration;
+					this->save_settings_();
+				}
 			}
 
 			this->position = cover::COVER_CLOSED;
