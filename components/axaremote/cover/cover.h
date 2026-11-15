@@ -55,6 +55,7 @@ protected:
 	std::string version;
 
 	bool detect_ = false;
+	uint32_t full_close_duration_{0};
 	float unlock_duration_;
 	float open_duration_;
 	float close_duration_;

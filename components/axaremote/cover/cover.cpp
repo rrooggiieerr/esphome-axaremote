@@ -102,6 +102,7 @@ void AXARemoteCover::dump_config() {
 	LOG_COVER("", "AXA Remote cover", this);
 	ESP_LOGCONFIG(TAG, "  Device: %s", this->device.c_str());
 	ESP_LOGCONFIG(TAG, "  Firmware: %s", this->version.c_str());
+	ESP_LOGCONFIG(TAG, "  Full Close Duration: %.1fs", this->full_close_duration_ / 1e3f);
 	ESP_LOGCONFIG(TAG, "  Unlock Duration: %.1fs", this->unlock_duration_ / 1e3f);
 	ESP_LOGCONFIG(TAG, "  Open Duration: %.1fs", this->open_duration_ / 1e3f);
 	ESP_LOGCONFIG(TAG, "  Close Duration: %.1fs", this->close_duration_ / 1e3f);
@@ -123,6 +124,7 @@ cover::CoverTraits AXARemoteCover::get_traits() {
 }
 
 void AXARemoteCover::set_close_duration(uint32_t close_duration) {
+	this->full_close_duration_ = close_duration;
 	this->unlock_duration_ = close_duration * 0.55f;
 	this->open_duration_ = close_duration  * 0.7f;
 	this->close_duration_ = close_duration * 0.7f;
