@@ -40,6 +40,9 @@ const float LOCK_CLOSED = 0.0f;
 
 const uint8_t COVER_OPERATION_NONE = 255;
 
+// Delay between tries of a command sent with max_tries.
+const uint32_t CMD_RETRY_INTERVAL = 500;  // ms
+
 // Settings stored in flash. Bump SETTINGS_PREF_VERSION whenever the layout of this struct changes.
 struct AXARemoteSettings {
 	uint32_t close_duration;  // Full close duration in ms, 0 if not calibrated
@@ -102,9 +105,9 @@ protected:
 	void recompute_position_();
 
 	AXAResponseCode send_cmd_(std::string &cmd, std::string &response);
-	AXAResponseCode send_cmd_(std::string &cmd, std::string &response, int max_retries);
+	AXAResponseCode send_cmd_(std::string &cmd, std::string &response, int max_tries);
 	AXAResponseCode send_cmd_(std::string &cmd);
-	AXAResponseCode send_cmd_(std::string &cmd, int max_retries);
+	AXAResponseCode send_cmd_(std::string &cmd, int max_tries);
 };
 
 }  // namespace axaremote

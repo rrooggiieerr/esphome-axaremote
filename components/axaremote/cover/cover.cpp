@@ -483,13 +483,9 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 	AXAResponseCode response_code;
 	int tries = 0;
 
-	uint32_t retry_interval = 1000;
-	if(this->polling_interval_ < retry_interval)
-		retry_interval = this->polling_interval_;
-
 	while(true) {
 		if(tries > 0)
-			ESP_LOGI(TAG, "Retrying to send command");
+			ESP_LOGI(TAG, "Retrying to send command %s", cmd.c_str());
 
 		response_code = this->send_cmd_(cmd, response);
 		if(response_code != AXAResponseCode::Invalid && response_code != AXAResponseCode::Error)
@@ -498,10 +494,10 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 
 		tries++;
 		if(tries == max_tries) {
-			ESP_LOGE(TAG, "Failed to send command");
+			ESP_LOGE(TAG, "Failed to send command %s", cmd.c_str());
 			break;
 		}
-		esphome::delay(retry_interval);
+		esphome::delay(CMD_RETRY_INTERVAL);
 	}
 
 	return response_code;
