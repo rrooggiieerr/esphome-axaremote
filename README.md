@@ -207,6 +207,9 @@ cover:
   50s. With __auto_calibrate__ enabled this is the starting value until the first calibration.
 - __auto_calibrate__ (Optional): Enable/disable auto calibration of the unlock, open, close and
   lock durations.
+- __detect__ (Optional): Detect at boot whether an AXA Remote is connected. When no AXA Remote
+  responds, the cover is hidden from Home Assistant. Useful for an optional second window opener.
+  Defaults to false.
 - __polling_interval__ (Optional): The time between status update requests from the AXA Remote.
   Defaults to 0s (continuous polling). __auto_calibrate__ will not be accurate with a reduced
   polling interval.
