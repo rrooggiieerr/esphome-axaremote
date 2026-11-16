@@ -154,6 +154,8 @@ the window is fully open.
 
 ## ESPHome example configuration
 
+This ESPHome External Component requires ESPHome 2026.10.
+
 ```
 esphome:
   name: axaremote

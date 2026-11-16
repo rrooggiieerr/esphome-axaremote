@@ -7,6 +7,7 @@ esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
   comment: "AXA Remote 2.0 Window Opener"
+  min_version: 2026.10.0
   # Automatically add the mac address to the name
   # so you can use a single firmware for all devices
   name_add_mac_suffix: true
@@ -23,7 +24,8 @@ esphome:
   devices:
     - id: axa_2
       name: "${friendly_name} 2"
-      relation: via
+      # Required from ESPHome 2026.11
+      # relation: via
 
 external_components:
   - source: github://rrooggiieerr/esphome-axaremote@0.1.5
