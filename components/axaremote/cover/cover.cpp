@@ -415,8 +415,8 @@ void AXARemoteCover::recompute_position_() {
       return;
   }
 
-  this->position = clamp(this->position, LOCK_CLOSED, LOCK_OPEN);
-  this->lock_position_ = clamp(this->lock_position_, cover::COVER_CLOSED, cover::COVER_OPEN);
+  this->position = clamp(this->position, cover::COVER_CLOSED, cover::COVER_OPEN);
+  this->lock_position_ = clamp(this->lock_position_, LOCK_CLOSED, LOCK_OPEN);
 
   this->last_recompute_time_ = now;
 }
