@@ -387,6 +387,10 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
         this->start_close_time_ = now;
         break;
     }
+
+    // Publish the started movement, so Home Assistant shows it straight away.
+    if (dir != cover::COVER_OPERATION_IDLE)
+      this->publish_state();
   } else
     this->retry_operation_ = dir;
 }
