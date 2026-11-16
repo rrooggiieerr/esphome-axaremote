@@ -504,7 +504,12 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
       }
     }
     if (millis() - now > 100) {
-      ESP_LOGE(TAG, "Timeout while waiting for response");
+      // While detecting an optional AXA Remote a missing response is expected.
+      if (this->detect_ && !this->connected_) {
+        ESP_LOGD(TAG, "Timeout while waiting for response");
+      } else {
+        ESP_LOGE(TAG, "Timeout while waiting for response");
+      }
       break;
     }
   }
@@ -517,8 +522,13 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
   int tries = 0;
 
   while (true) {
-    if (tries > 0)
-      ESP_LOGI(TAG, "Retrying to send command %s", cmd.c_str());
+    if (tries > 0) {
+      if (this->detect_ && !this->connected_) {
+        ESP_LOGD(TAG, "Retrying to send command %s", cmd.c_str());
+      } else {
+        ESP_LOGI(TAG, "Retrying to send command %s", cmd.c_str());
+      }
+    }
 
     response_code = this->send_cmd_(cmd, response);
     if (response_code != AXAResponseCode::Invalid && response_code != AXAResponseCode::Error)
@@ -527,7 +537,11 @@ AXAResponseCode AXARemoteCover::send_cmd_(std::string &cmd, std::string &respons
 
     tries++;
     if (tries == max_tries) {
-      ESP_LOGE(TAG, "Failed to send command %s", cmd.c_str());
+      if (this->detect_ && !this->connected_) {
+        ESP_LOGD(TAG, "Failed to send command %s", cmd.c_str());
+      } else {
+        ESP_LOGE(TAG, "Failed to send command %s", cmd.c_str());
+      }
       break;
     }
     esphome::delay(CMD_RETRY_INTERVAL);
