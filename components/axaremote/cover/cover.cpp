@@ -46,12 +46,7 @@ void AXARemoteCover::setup() {
   this->connected_ = true;
 
   // Restore the settings from flash.
-#if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 7, 0)
-  this->settings_pref_ = this->make_entity_preference<AXARemoteSettings>(SETTINGS_PREF_VERSION, true);
-#else
-  this->settings_pref_ =
-      global_preferences->make_preference<AXARemoteSettings>(this->get_preference_hash() ^ SETTINGS_PREF_VERSION, true);
-#endif
+  this->settings_pref_ = this->make_entity_preference<AXARemoteSettings>(SETTINGS_PREF_VERSION);
   AXARemoteSettings settings{};
   if (this->settings_pref_.load(&settings)) {
     this->settings_ = settings;
