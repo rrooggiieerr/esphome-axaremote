@@ -89,9 +89,8 @@ void AXARemoteCover::setup() {
     AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 2);
 
     if (this->position == cover::COVER_OPEN) {
-      // After a power outage the AXA Remote will only close if first the open command is
-      // given. If the window is fully open we can safely give an other open command without
-      // influencing the actual window position.
+      // After a power outage the AXA Remote will only close if first the open command is given. If the window is fully
+      // open we can safely give an other open command without influencing the actual window position.
       esphome::delay(10);
       this->send_cmd_(AXACommand::OPEN, 2);
     }
