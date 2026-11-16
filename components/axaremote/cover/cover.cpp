@@ -44,6 +44,14 @@ void AXARemoteCover::setup() {
       ESP_LOGI(TAG, "Restored close duration: %.1fs", this->settings_.close_duration / 1e3f);
   }
 
+  // Write the position to flash as soon as a movement ends.
+  this->add_on_state_callback([this]() {
+    if (this->current_operation == cover::COVER_OPERATION_IDLE &&
+        this->published_operation_ != cover::COVER_OPERATION_IDLE)
+      this->defer([]() { global_preferences->sync(); });
+    this->published_operation_ = this->current_operation;
+  });
+
   auto restore = this->restore_state_();
   if (restore.has_value()) {
     ESP_LOGI(TAG, "Restoring state");
