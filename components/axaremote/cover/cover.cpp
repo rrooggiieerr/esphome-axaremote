@@ -1,6 +1,8 @@
 #include "esphome/core/log.h"
 #include "cover.h"
 
+#include <cinttypes>
+
 #ifdef USE_ESP32
 #include <esp_system.h>
 #endif
@@ -9,6 +11,7 @@ namespace esphome {
 namespace axaremote {
 
 static const char *const TAG = "axaremote.cover";
+static const char *const RETRY_TIMEOUT = "retry";
 
 // Whether the ESP started because power was (re)applied. The AXA Remote shares the power supply, so it
 // lost power as well.
@@ -188,13 +191,7 @@ void AXARemoteCover::loop() {
 
   const uint32_t now = millis();
 
-  uint32_t retry_interval = 1000;
-  if (this->polling_interval_ < retry_interval)
-    retry_interval = this->polling_interval_;
-  if (this->retry_operation_ != COVER_OPERATION_NONE && now - this->last_cmd_time_ >= retry_interval) {
-    ESP_LOGD(TAG, "Retrying operation");
-    this->start_direction_(cover::CoverOperation(this->retry_operation_));
-  } else if (this->retry_operation_ == COVER_OPERATION_NONE && now - this->last_cmd_time_ >= this->polling_interval_) {
+  if (now - this->last_cmd_time_ >= this->polling_interval_) {
     AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS);
 
     if (this->power_outage_detected_ &&
@@ -340,6 +337,9 @@ void AXARemoteCover::control(const cover::CoverCall &call) {
 }
 
 void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
+  // A new direction replaces a pending retry.
+  this->cancel_timeout(RETRY_TIMEOUT);
+
   if (dir == this->current_operation && dir != cover::COVER_OPERATION_IDLE)
     return;
 
@@ -369,7 +369,6 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
 
   if (response_code == AXAResponseCode::OK) {
     this->current_operation = dir;
-    this->retry_operation_ = COVER_OPERATION_NONE;
 
     switch (dir) {
       case cover::COVER_OPERATION_IDLE:
@@ -391,8 +390,11 @@ void AXARemoteCover::start_direction_(cover::CoverOperation dir) {
     // Publish the started movement, so Home Assistant shows it straight away.
     if (dir != cover::COVER_OPERATION_IDLE)
       this->publish_state();
-  } else
-    this->retry_operation_ = dir;
+  } else {
+    // Retry until the AXA Remote accepts the command.
+    ESP_LOGD(TAG, "Retrying operation in %" PRIu32 " ms", CMD_RETRY_INTERVAL);
+    this->set_timeout(RETRY_TIMEOUT, CMD_RETRY_INTERVAL, [this, dir]() { this->start_direction_(dir); });
+  }
 }
 
 void AXARemoteCover::recompute_position_() {

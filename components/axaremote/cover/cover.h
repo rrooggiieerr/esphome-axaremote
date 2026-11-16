@@ -38,9 +38,7 @@ enum class AXAResponseCode {
 const float LOCK_OPEN = 1.0f;
 const float LOCK_CLOSED = 0.0f;
 
-const uint8_t COVER_OPERATION_NONE = 255;
-
-// Delay between tries of a command sent with max_tries.
+// Delay between tries of a command.
 const uint32_t CMD_RETRY_INTERVAL = 500;  // ms
 
 // Settings stored in flash. Bump SETTINGS_PREF_VERSION whenever the layout of this struct changes.
@@ -90,7 +88,6 @@ class AXARemoteCover : public Component, public cover::Cover, public uart::UARTD
   float lock_position_{0};
   bool lock_cleared_ = false;
   cover::CoverOperation last_operation_{cover::COVER_OPERATION_OPENING};
-  uint8_t retry_operation_ = COVER_OPERATION_NONE;
 
   AXARemoteSettings settings_{};
   ESPPreferenceObject settings_pref_;
