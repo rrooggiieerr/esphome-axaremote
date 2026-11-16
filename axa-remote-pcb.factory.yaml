@@ -7,7 +7,7 @@ esphome:
   # configuration and updates.
   project:
     name: rrooggiieerr.axaremote
-    version: dev # This will be replaced by the github workflows with the `release` version
+    version: dev  # This will be replaced by the github workflows with the `release` version
 
 # This points to the public location of the yaml file that will be adopted.
 # In this case it is the core yaml file that does not contain the extra things

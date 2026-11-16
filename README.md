@@ -57,7 +57,7 @@ these messages.
 
 The AXA Remote component depends on the ESPHome UART component. The ESP8266 has a software emulated
 UART which has shown to be quite flaky. It is recommended to use a micro controller with a hardware
-UART, like the ESP32, for increased accuracy. 
+UART, like the ESP32, for increased accuracy.
 
 ### Wiring
 
@@ -144,7 +144,7 @@ the real position.
 
 ## Quirks
 
-The AXA Remote firmware has some nasty quirks. 
+The AXA Remote firmware has some nasty quirks.
 
 After a power outage the AXA Remote always reports the lock state as unlocked even when the window
 is closed and locked. Only opening and then closing the window will reset the lock state.

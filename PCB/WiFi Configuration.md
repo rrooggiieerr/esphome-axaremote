@@ -3,7 +3,7 @@
 
 The ESPHome based firmware implements the open _Improv via BLE_ standard for configuring Wi-Fi. If
 your Home Assistant has Bluetooth configured, or you're using _[Bluetooth Proxies](https://esphome.io/components/bluetooth_proxy/)_,
-the AXA Remote PCB will be automatically discovered by the Improv integration. 
+the AXA Remote PCB will be automatically discovered by the Improv integration.
 
 <img src="PCB discovered by Improv via BLE.png" width="50%"/>
 

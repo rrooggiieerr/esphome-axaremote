@@ -104,16 +104,16 @@ binary_sensor:
       ignore_strapping_warning: True
     internal: True
     filters:
-      - delayed_on: 50ms 
+      - delayed_on: 50ms
     on_multi_click:
       - timing:
           - ON for 0.2s to 3s
           - OFF for 0.1s to 2s
           - ON for 0.2s to 3s
           - OFF for 0.1s to 2s
-          - ON for at least 5s 
+          - ON for at least 5s
         then:
-          - repeat: 
+          - repeat:
               count: 5
               then:
                 - light.turn_on: _status_led
