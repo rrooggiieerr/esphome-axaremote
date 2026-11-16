@@ -41,6 +41,10 @@ The frame is made of zamac, a zinc aluminium alloy while the casing remains plas
 motors, one to unlock and an other to open the window. This is the model that I used to develop this
 ESPHome External Component.
 
+### Ivana Remote 2.0
+
+A rebranded AXA Remote 2.0
+
 ### AXA Remote 2.0S
 
 A synchronised version AXA Remote 2.0 that keeps a second window opener in sync with a master
