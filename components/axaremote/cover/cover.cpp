@@ -1,10 +1,25 @@
 #include "esphome/core/log.h"
 #include "cover.h"
 
+#ifdef USE_ESP32
+#include <esp_system.h>
+#endif
+
 namespace esphome {
 namespace axaremote {
 
 static const char *const TAG = "axaremote.cover";
+
+// Whether the ESP started because power was (re)applied. The AXA Remote shares the power supply, so it
+// lost power as well.
+static bool is_power_on_reset() {
+#ifdef USE_ESP32
+  const esp_reset_reason_t reason = esp_reset_reason();
+  return reason == ESP_RST_POWERON || reason == ESP_RST_BROWNOUT;
+#else
+  return false;
+#endif
+}
 
 void AXARemoteCover::setup() {
   ESP_LOGCONFIG(TAG, "Setting up AXA Remote cover...");
