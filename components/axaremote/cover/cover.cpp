@@ -197,6 +197,12 @@ void AXARemoteCover::loop() {
   } else if (this->retry_operation_ == COVER_OPERATION_NONE && now - this->last_cmd_time_ >= this->polling_interval_) {
     AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS);
 
+    if (this->power_outage_detected_ &&
+        (response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked)) {
+      ESP_LOGI(TAG, "Lock state reported correctly again after power outage");
+      this->power_outage_detected_ = false;
+    }
+
     if ((response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked) &&
         this->current_operation == cover::COVER_OPERATION_IDLE && this->position != cover::COVER_CLOSED) {
       // This happens when the window opener is closed with the remote.
