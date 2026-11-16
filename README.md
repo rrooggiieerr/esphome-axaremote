@@ -201,7 +201,8 @@ cover:
 ### Configuration variables:
 
 - __close_duration__ (Optional): The close duration from fully open to fully locked. From this time
-  the unlock, open, close and lock durations are derived.
+  the unlock, open, close and lock durations are derived. Must be between 30s and 60s, defaults to
+  50s. With __auto_calibrate__ enabled this is the starting value until the first calibration.
 - __auto_calibrate__ (Optional): Enable/disable auto calibration of the unlock, open, close and
   lock durations.
 - __polling_interval__ (Optional): The time between status update requests from the AXA Remote.
