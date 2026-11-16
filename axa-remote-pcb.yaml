@@ -28,7 +28,7 @@ esphome:
       # relation: via
 
 external_components:
-  - source: github://rrooggiieerr/esphome-axaremote@0.1.5
+  - source: github://rrooggiieerr/esphome-axaremote@0.1.6
     components: [axaremote]
     refresh: never
 
