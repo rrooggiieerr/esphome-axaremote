@@ -245,7 +245,7 @@ void AXARemoteCover::loop() {
       this->current_operation = cover::COVER_OPERATION_IDLE;
       this->publish_state();
     } else if (response_code == AXAResponseCode::Unlocked && this->position == cover::COVER_CLOSED &&
-               this->current_operation == cover::COVER_OPERATION_IDLE) {
+               this->current_operation == cover::COVER_OPERATION_IDLE && !this->power_outage_detected_) {
       // This happens when the window opener is opened with the remote.
       ESP_LOGD(TAG, "Opened with remote?");
       this->position = cover::COVER_CLOSED;
