@@ -51,6 +51,8 @@ void AXARemoteCover::setup() {
     ESP_LOGV(TAG, "Current position: %.1f%%", this->position * 100);
     ESP_LOGI(TAG, "Current operation: %d", this->current_operation);
 
+    this->last_position_ = this->position;
+
     AXAResponseCode response_code = this->send_cmd_(AXACommand::STATUS, 2);
 
     if (this->position == cover::COVER_OPEN) {
