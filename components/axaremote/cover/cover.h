@@ -3,7 +3,6 @@
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
 #include "esphome/core/version.h"
-// #include "esphome/core/helpers.h"
 #include "esphome/components/cover/cover.h"
 #include "esphome/components/uart/uart.h"
 
