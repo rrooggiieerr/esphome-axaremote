@@ -76,6 +76,8 @@ class AXARemoteCover : public Component, public cover::Cover, public uart::UARTD
   uint32_t polling_interval_{0};
   bool auto_calibrate_ = false;
   bool power_outage_detected_ = false;
+  // Operation of the last published state, to detect the end of a movement.
+  cover::CoverOperation published_operation_{cover::COVER_OPERATION_IDLE};
   bool connected_ = false;
 
   uint32_t last_cmd_time_{0};
