@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Set up the development environment.
+
+# Stop on errors
+set -e
+
+cd "$(dirname "$0")/.."
+
+if [ ! -n "$VIRTUAL_ENV" ]; then
+  if [ -x "$(command -v uv)" ]; then
+    uv venv .venv
+  else
+    python3 -m venv .venv
+  fi
+  source .venv/bin/activate
+fi
+
+if ! [ -x "$(command -v uv)" ]; then
+  python3 -m pip install uv
+fi
+
+uv pip install \
+  -r requirements_dev.txt \
+  --upgrade
+
+prek install --overwrite
+
+echo
+echo "Done. Activate the environment with: source .venv/bin/activate"
