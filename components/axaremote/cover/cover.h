@@ -71,11 +71,11 @@ protected:
 
 	bool detect_ = false;
 	uint32_t full_close_duration_{0};
-	float unlock_duration_;
-	float open_duration_;
-	float close_duration_;
-	float lock_duration_;
-	uint32_t polling_interval_;
+	float unlock_duration_{0};
+	float open_duration_{0};
+	float close_duration_{0};
+	float lock_duration_{0};
+	uint32_t polling_interval_{0};
 	bool auto_calibrate_ = false;
 	bool power_outage_detected_ = false;
 	bool connected_ = false;
