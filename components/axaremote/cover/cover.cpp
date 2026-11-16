@@ -52,6 +52,13 @@ void AXARemoteCover::setup() {
     this->published_operation_ = this->current_operation;
   });
 
+  // After a power outage the AXA Remote reports the lock state as unlocked, also when the window is closed and
+  // locked, until the window has been opened and closed again.
+  if (is_power_on_reset()) {
+    ESP_LOGW(TAG, "Power outage detected");
+    this->power_outage_detected_ = true;
+  }
+
   auto restore = this->restore_state_();
   if (restore.has_value()) {
     ESP_LOGI(TAG, "Restoring state");
@@ -69,34 +76,15 @@ void AXARemoteCover::setup() {
       // influencing the actual window position.
       esphome::delay(10);
       this->send_cmd_(AXACommand::OPEN, 2);
-    } else if (this->position == cover::COVER_CLOSED && response_code == AXAResponseCode::Unlocked) {
-      // After a power outage the AXA Remote always reports the lock state as unlocked even
-      // when the window is closed and locked. Only opening and then closing the window will
-      // reset the lock state.
+    }
+
+#ifndef USE_ESP32
+    // Without a reset reason, a closed window that reports unlocked is the best indication of a power outage.
+    if (this->position == cover::COVER_CLOSED && response_code == AXAResponseCode::Unlocked) {
       ESP_LOGW(TAG, "Power outage detected");
       this->power_outage_detected_ = true;
-      //			esphome::delay(10);
-      //			this->send_cmd_(AXACommand::OPEN, 2;
-      //			esphome::delay(10000);
-      //			this->send_cmd_(AXACommand::CLOSE, 2);
-      //			call = this->make_call();
-      //			call.set_command_close();
-      //			call.perform();
-    } else if (this->position == cover::COVER_CLOSED &&
-               (response_code == AXAResponseCode::StrongLocked || response_code == AXAResponseCode::WeakLocked)) {
-      // This is as expected, no power outage occurred.
-      //		} else {
-      //			// After a power outage the AXA Remote will only close if first the open command is
-      //			// given. If the window is partially open it's not possible to detect an power outage.
-      //			ESP_LOGW(TAG, "Power outage detected");
-      //			this->power_outage_detected_ = true;
-      //			esphome::delay(10);
-      //			this->send_cmd_(AXACommand::OPEN, 2);
-      //			esphome::delay(2000);
-      //			this->send_cmd_(AXACommand::CLOSE, 2);
-      //			esphome::delay(2000);
-      //			this->send_cmd_(AXACommand::STOP, 2);
     }
+#endif
 
     if (this->position > 0.0f) {
       this->lock_position_ = LOCK_OPEN;
