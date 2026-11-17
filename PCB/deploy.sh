@@ -25,7 +25,7 @@ while true; do
 	fi
 
 	# Erase ESP32
-	esptool --port "$PORT" --chip esp32 erase_flash
+	esptool --port "$PORT" --chip esp32 erase-flash
 
 	# Flash firmware
 	esptool --port "$PORT" --baud 921600 write-flash 0x00 "$TMPFILE"
