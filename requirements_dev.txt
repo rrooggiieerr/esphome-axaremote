@@ -2,7 +2,7 @@
 # The tool versions match ESPHome's requirements_dev.txt and requirements_test.txt, and the revisions
 # in .pre-commit-config.yaml. Keep them in sync with ESPHome.
 
-esphome>=2026.10.0,<2026.11.0
+esphome>=2026.11.0
 
 # Formatters and linters
 clang-format==23.1.3
